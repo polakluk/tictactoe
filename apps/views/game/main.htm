@@ -1,0 +1,76 @@
+<div class="lg-col-1 container">
+	<div class="page-header text-center">
+	<h1>Current games<small>{{ @game_username }}</small></h1>
+	</div>
+
+	<div class="container" style="padding: 0 30px 0px 0;">
+
+		<div class="row">
+
+			<repeat group="{{ @desks }}" value="{{ @desk }}">
+				<div class="col-lg-6">
+
+<div class="panel panel-success">
+	<div class="panel-heading">
+    	<h3 class="panel-title">Game #{{ @game_number }}</h3>
+  	</div>
+  	<div class="panel-body">
+  		<h3 id="{{@game_id}}">
+  			Turn {{ @game_turn }}
+	  		<check if="{{ @game_team == 'red' }}">
+	  			<true>
+		  			<span  class="label label-danger">red</span>
+	  			</true>
+	  			<false>
+		  			<span  class="label label-primary">blue</span>
+	  			</false>
+	  		</check>
+  		</h3>  			
+  	</div>
+
+	<table class="table table-bordered text-center">
+		<repeat group="{{ @game_table }}" value="{{ @row }}">
+			<tr>
+				<repeat group="{{ @row }}" value="{{ @col }}">
+					<switch expr="{{ @col }}">
+						<case value="{{ '1' }}" break="TRUE">
+							<td>
+							</td>
+								<img src="{{ @BASE }}/media/images/blue.png" alt="blue" />
+						</case>
+						<case value="{{ '0' }}" break="TRUE">
+							<td>
+								<img src="{{ @BASE }}/media/images/red.png" alt="red" />
+							</td>
+						</case>
+						<default>
+							<td>
+								&nbsp;
+							</td>
+						</default>
+					</switch>
+				</repeat>
+			</tr>
+		</repeat>
+		
+			<tr>
+				<td colspan="3">
+			  		<a href="{{ @BASE }}/game/join/{{ @game_number }}" class="btn btn-success pull-right">
+						<check if="{{ @join_game}}">
+							<true>Join game</true>
+							<false>Spectate game</false>
+						</check>
+			  		</a>				
+				</td>
+			</tr>
+	</table>
+</div>
+
+				</div>    
+			</repeat>
+
+		</div>
+
+	</div>	
+	<a href="{{ @BASE }}" class="btn btn-info pull-right">Back to home</a>	
+</div>

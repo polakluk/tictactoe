@@ -1,0 +1,11 @@
+<html lang="en">
+	<head>
+		<include href="tmpl/head.htm" />
+	</head>
+	
+	<body>
+		<include href="tmpl/header.htm" />
+		<include if="{{ @page_body }}" href="{{ @page_body }}" />
+		<include href="tmpl/footer.htm" />		
+	</body>
+</html>
