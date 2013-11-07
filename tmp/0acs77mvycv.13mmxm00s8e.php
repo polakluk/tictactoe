@@ -1,8 +1,3 @@
-<div class="lg-col-1 container">
-	<div class="page-header text-center">
-	<h1>Tic Tac Toe - Multiplayer <small>created by Lukáš Polák</small></h1>		
-	</div>
-
 	<div class="container" style="padding: 0 30px 0px 0px;">
 
 		<div class="row">
@@ -62,4 +57,3 @@
 		</div>
 
 	</div>
-</div>

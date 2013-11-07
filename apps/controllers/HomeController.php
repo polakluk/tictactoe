@@ -15,7 +15,7 @@ class HomeController extends BaseController {
 			case 'create_user':
 				{
 					$this->f3->set( 'SESSION.username', $this->f3->get( 'POST.username' ) );
-					$this->f3->reroute( '/' );
+					$this->f3->reroute( '/showroom' );
 					return false;
 					break;
 				}

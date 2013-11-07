@@ -4,8 +4,10 @@
 	</head>
 	
 	<body>
-		<include href="tmpl/header.htm" />
-		<include if="{{ @page_body }}" href="{{ @page_body }}" />
-		<include href="tmpl/footer.htm" />		
+		<div class="lg-col-1 container">
+			<include href="tmpl/header.htm" />
+			<include if="{{ @page_body }}" href="{{ @page_body }}" />
+			<include href="tmpl/footer.htm" />		
+		</div>
 	</body>
 </html>

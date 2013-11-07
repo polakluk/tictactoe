@@ -14,24 +14,30 @@ class Dispatcher {
 
  		$this->f3 = Base::instance();
         $this->db = new DB\SQL( $this-> f3->get('db_dns') . $this->f3->get('db_name'), $this->f3->get('db_user'), $this->f3->get('db_pass') );
+		
+		if( !$this->f3->exists( 'SESSION.msgs' ) ) {
+		}
 	}
-	
 	
 	/*
 	 * This method renders home page
 	 */
-	public function display_home() {
-		$controller = new \Controllers\HomeController( $this->f3 );
-		
-		$this->f3->set( 'page_body', $controller->Execute() );
-		echo \Template::instance()->render( 'tmpl/layout.htm' );
+	public function DisplayHome() {
+		$this->display( 'Home' );
 	}
 
 	/*
 	 * This method renders a certain view
 	 */
-	public function display_view() {
-		$name = '\\Controllers\\'.ucwords( $this->f3->get('PARAMS.view') ).'Controller';
+	public function DisplayView() {
+		$this->display( $this->f3->get('PARAMS.view') );
+	}
+
+	/*
+	 * Handles displaying content on the site
+	 */	
+	private function display( $view ) {
+		$name = '\\Controllers\\'.ucwords( $view ).'Controller';
 		
 		$c = new $name( $this->f3 );
 		
@@ -40,7 +46,8 @@ class Dispatcher {
 			return;
 		} else { // nah, we'll show everything right now
 			$this->f3->set( 'page_body', $render );
-			echo \Template::instance()->render( 'tmpl/layout.htm' );			
-		}
+			echo \Template::instance()->render( 'tmpl/layout.htm' );
+			$this->f3->set( 'SESSION.msgs', array() );
+		}		
 	}
 }
