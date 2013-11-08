@@ -21,10 +21,10 @@ class ShowroomController extends BaseController {
 		$desks = array();
 		$games = $this->getGames();
 		for( $i = 0; $i < 2; $i++ ) {
-			$this->f3->set( 'game_id', $i );
-			$this->f3->set( 'game_turn', $games[$i]->turn );
-			$this->f3->set( 'game_table', $games[$i]->table );
-			$this->f3->set( 'game_team', $games[$i]->team );
+			$this->f3->set( 'game_id', $games[$i]->info->game_id );
+			$this->f3->set( 'game_turn', $games[$i]->info->game_turn );
+			$this->f3->set( 'game_table', $games[$i]->desk );
+			$this->f3->set( 'game_team', $games[$i]->info->game_team );
 			$desks[] = \Template::instance()->render( 'views/showroom/desk.htm' );
 		}
 		$this->f3->clear( 'game_id' );
@@ -42,11 +42,16 @@ class ShowroomController extends BaseController {
 	private function getGames() {
 		$result = array();
 		$model = new \Models\DeskModel( $this->f3, $this->db );
+		$model->SetState( array( 'order_limit' =>  ShowroomController::MAX_GAMES ) );
+		$desks = $model->GetList();
 		
-		$desks = $model->GetList( array( 'limit' => ShowroomController::MAX_GAMES ) );
-		
-		for( $i = 0, $c = count( $desks ); $i < $c; $i++ ) {
-			$result []= $model->GetItem( $desks[$i]->game_id );
+		while( !$desks->dry() ) {
+			$game = new \stdClass();
+			$game->info = clone $desks;
+			$game->desk = $model->GetDesk( $desks->game_id );
+
+			$result []= $game;
+			$desks->skip(1);
 		}
 		
 		return $result;

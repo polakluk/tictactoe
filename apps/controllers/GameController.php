@@ -70,10 +70,10 @@ class GameController extends BaseController {
 			return false;
 		}
 
-		$this->f3->set( 'game_id', $game->game_id );
-		$this->f3->set( 'game_turn', $game->turn );
-		$this->f3->set( 'game_table', $game->table );
-		$this->f3->set( 'game_team', $game->team );
+		$this->f3->set( 'game_id', $game->info->game_id );
+		$this->f3->set( 'game_turn', $game->info->game_turn );
+		$this->f3->set( 'game_table', $game->desk );
+		$this->f3->set( 'game_team', $game->info->game_team );
 		$desk = \Template::instance()->render( 'views/game/desk.htm' );
 		$this->f3->set( 'desk', $desk );
 		$this->f3->clear( 'game_table' );
@@ -96,14 +96,6 @@ class GameController extends BaseController {
 			$game->turn = $i + 4;
 			$game->team = $i ? 'red' : 'blue';
 			
-			$game->table = array();
-			
-			for( $row = 0; $row < 3; $row++ ) {
-				$game->table[$row] = array();
-				for( $col = 0; $col < 3; $col++ ) {					
-					$game->table[$row][$col] = ( $row + $col ) % 2;
-				}
-			}
 			
 			$game->table[1][0] = '';
 			

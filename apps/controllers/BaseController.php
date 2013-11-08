@@ -8,14 +8,16 @@ abstract class BaseController {
 	
 	protected $db; // instance of the DB class
 	
+	public $output_type = 'template'; // which template preprocessor should be used to render the current view ('template' / 'view')
+	
 	/*
 	 * Constructor in which I connect to the DB 
 	 * 
 	 */
-	function __construct( $f3 ) {
+	function __construct( $f3, $db ) {
 
  		$this->f3 = $f3;
-        $this->db = new \DB\SQL( $this-> f3->get('db_dns') . $this->f3->get('db_name'), $this->f3->get('db_user'), $this->f3->get('db_pass') );
+        $this->db = $db;
 	}	
 
 	/*
