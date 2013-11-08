@@ -48,7 +48,7 @@ class ShowroomController extends BaseController {
 		while( !$desks->dry() ) {
 			$game = new \stdClass();
 			$game->info = clone $desks;
-			$game->desk = $model->GetDesk( $desks->game_id );
+			$game->desk = $model->GetDesk( $desks );
 
 			$result []= $game;
 			$desks->skip(1);

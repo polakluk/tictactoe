@@ -96,9 +96,6 @@ class GameController extends BaseController {
 			$game->turn = $i + 4;
 			$game->team = $i ? 'red' : 'blue';
 			
-			
-			$game->table[1][0] = '';
-			
 			$result []= $game;
 		}
 		

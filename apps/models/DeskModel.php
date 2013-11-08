@@ -25,7 +25,7 @@ class DeskModel extends BaseModel{
 
 		$game = new \stdClass();
 		$game->info = clone $desk;
-		$game->desk = $this->GetDesk($id);
+		$game->desk = $this->GetDesk( $desk );
 		
 		return $game;
 	}
@@ -33,19 +33,19 @@ class DeskModel extends BaseModel{
 	/*
 	 * Fills in desk array with moves from DB
 	 */
-	public function GetDesk($id) {
+	public function GetDesk( &$game ) {
 		$result  = array();
 	
 		// set the whole desk to default value	
-		for( $row = 0; $row < 3; $row++ ) {
+		for( $row = 0; $row < $game->game_size; $row++ ) {
 			$result[$row] = array();
-			for( $col = 0; $col < 3; $col++ ) {					
+			for( $col = 0; $col < $game->game_size; $col++ ) {					
 				$result[$row][$col] = '';
 			}
 		}
 		// now load moves from the DB
 		$moves = new \DB\SQL\Mapper( $this->db, 'moves' );
-		$moves->load( array( 'game_id = ?', $id ) );
+		$moves->load( array( 'game_id = ?', $game->game_id ) );
 		while( !$moves->dry() ) {
 			$result[$moves->row][$moves->col] = $moves->team;
 			$moves->skip(1);

@@ -10,6 +10,8 @@ abstract class BaseController {
 	
 	public $output_type = 'template'; // which template preprocessor should be used to render the current view ('template' / 'view')
 	
+	public $view = 'main'; // which view is being displayed ( 'main' is default )
+
 	/*
 	 * Constructor in which I connect to the DB 
 	 * 

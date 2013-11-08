@@ -4,7 +4,7 @@
 	</head>
 	
 	<body>
-		<div class="lg-col-1 container">
+		<div class="lg-col-1 container container-{{ @controller }} container-{{ @controller }}-{{ @view }}">
 			<include href="tmpl/header.htm" />
 			<include if="{{ @page_body }}" href="{{ @page_body }}" />
 			<include href="tmpl/footer.htm" />		

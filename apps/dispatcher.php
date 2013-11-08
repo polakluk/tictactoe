@@ -37,8 +37,8 @@ class Dispatcher {
 	/*
 	 * Handles displaying content on the site
 	 */	
-	private function display( $view ) {
-		$name = '\\Controllers\\'.ucwords( $view ).'Controller';
+	private function display( $controller ) {
+		$name = '\\Controllers\\'.ucwords( $controller ).'Controller';
 		
 		$c = new $name( $this->f3, $this->db );
 		
@@ -47,6 +47,9 @@ class Dispatcher {
 			return;
 		} else { // nah, we'll show everything right now
 			$this->f3->set( 'page_body', $render );
+			$this->f3->set( 'controller', $controller );
+			$this->f3->set( 'view', $c->view );
+			
 			if( $c->output_type == 'template' ) {
 				echo \Template::instance()->render( $this->f3->get('template') );				
 			} else { // View
