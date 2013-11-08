@@ -7,7 +7,7 @@ Game.Init = function() {
 	Game.elements = {};
 	Game.elements.main_container = $( 'div.container-game' );
 	Game.elements.panel_msg = $( '#panel-msg', Game.elements.main_container );
-	Game.elements.desk = ( 'table.table-desk', Game.elements.main_container );
+	Game.elements.desk = $( 'table.table-desk', Game.elements.main_container );
 }
 
 // this method determines, whether the game object should be used for this page
@@ -18,12 +18,14 @@ Game.Ready = function() {
 //this method binds all events on elements
 Game.BindEvents = function() {
 	Game.elements.desk.on( 'click', 'td.empty', function( e ) {
-		var obj = $( e );
+		var obj = $( this );
 		var post_data = {
-			'game' : Game.elements.main_container.data( 'game' ),
-			'row' : obj.data( 'row' ),
-			'col' : obj.data( 'col' )
+			'game' : Game.elements.desk.attr( 'data-game' ),
+			'row' : obj.attr( 'data-row' ),
+			'col' : obj.attr( 'data-col' )
 					};
+		console.log( post_data );
+		
 		
 		$.ajax( {
 			'type' : 'POST',

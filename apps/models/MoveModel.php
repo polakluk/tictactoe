@@ -11,7 +11,7 @@ class MoveModel extends BaseModel{
 	public function ResetModel() {
 		$this->state = array(
 			'order_by' => 'created DESC',
-			'order_limit' => '3',
+			'order_limit' => '',
 			'order_offset' => '0',
 			'game_id' => 0
 		);

@@ -68,6 +68,17 @@ class GameController extends BaseController {
 					} else {
 						$msg[0] = 'Your move has been successfully recorded!';
 						$msg[1] = 'success';
+						
+						// save the move
+						$table = new \DB\SQL\Mapper( $this->db, 'moves' );
+						$table->game_id = $game_id;
+						$table->row = $row;
+						$table->col = $col;
+						$table->player_id = 1;
+						$table->team = 1;
+						$table->created = date( 'Y-m-d H:i:s', time() );
+						$table->state = \Tools::MOVE_STATE_DONE;
+						$table->save();
 					}
 					break;
 				}
