@@ -37,34 +37,8 @@
 			</div>
 		</div>
 		
-		
-		<div class="panel panel-danger poll">
-			<div class="panel-heading">
-		    	<h3 class="panel-title">Poll</h3>
-		  	</div>
-		  	<div class="panel-body">
-		  		<?php echo $this->render('views/game/poll/available.htm',$this->mime,get_defined_vars()); ?>
-			</div>
-		</div>
-		
-		<div class="panel panel-danger poll">
-			<div class="panel-heading">
-		    	<h3 class="panel-title">Poll</h3>
-		  	</div>
-		  	<div class="panel-body">
-		  		<?php echo $this->render('views/game/poll/questions.htm',$this->mime,get_defined_vars()); ?>
-			</div>
-		</div>
-		
-		<div class="panel panel-danger poll">
-			<div class="panel-heading">
-		    	<h3 class="panel-title">Poll</h3>
-		  	</div>
-		  	<div class="panel-body">
-		  		<?php echo $this->render('views/game/poll/results.htm',$this->mime,get_defined_vars()); ?>
-			</div>
-		</div		
-	
+
+
 <?php endif; ?>
 
 
@@ -89,3 +63,4 @@
   		</table>
 	</div>
 </div>
+<a href="<?php echo $BASE; ?>/game/leave/<?php echo $game_id; ?>" class="btn btn-info pull-right">Leave the Game</a>	

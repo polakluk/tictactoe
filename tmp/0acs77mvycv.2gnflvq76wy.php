@@ -14,7 +14,7 @@
 
 <?php if ($whole_page): ?>
 
-			<?php echo $this->render('tmpl/footer.htm',$this->mime,get_defined_vars()); ?>		
+			<?php echo $this->render('tmpl/footer.htm',$this->mime,get_defined_vars()); ?>
 		</div>
 	</body>
 </html>

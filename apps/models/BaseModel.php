@@ -8,6 +8,8 @@ abstract class BaseModel{
 	protected $db; // instance of the db class
 	protected $state = array(); // inner state of the model
 	
+	public $table = ''; // table connected to this model
+	
 	/*
 	 * Constructor takes all the important objects for the model
 	 */
@@ -35,7 +37,10 @@ abstract class BaseModel{
 	/*
 	 * Gets a simple item from this model based on its ID
 	 */
-	abstract public function GetItem( $id );
+	public function GetItem( $id ){
+		$obj = new \DB\SQL\Mapper( $this->db, $this->table );
+		return $obj->load( $id );
+	}
 
 	/*
 	 * Gets a list of items based on the conditions

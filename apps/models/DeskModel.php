@@ -4,6 +4,7 @@ namespace Models;
 
 class DeskModel extends BaseModel{
 		
+	public $table = 'games';
 	/*
 	 * Resets inner state of the model
 	 */
@@ -20,8 +21,7 @@ class DeskModel extends BaseModel{
 	 * Gets a simple item from this model based on its ID
 	 */
 	public function GetItem( $id ) {
-		$desk = new \DB\SQL\Mapper( $this->db, 'games' );
-		$desk->load( $id );
+		$desk = parent::GetItem( $id );
 
 		$game = new \stdClass();
 		$game->info = clone $desk;
@@ -44,8 +44,9 @@ class DeskModel extends BaseModel{
 			}
 		}
 		// now load moves from the DB
-		$moves = new \DB\SQL\Mapper( $this->db, 'moves' );
-		$moves->load( array( 'game_id = ?', $game->game_id ) );
+		$moves_model = new \Models\MoveModel( $this->f3, $this->db );
+		$moves_model->SetState( array( 'game_id' => $game->game_id ) );
+		$moves = $moves_model->GetList();
 		while( !$moves->dry() ) {
 			$result[$moves->row][$moves->col] = $moves->team;
 			$moves->skip(1);

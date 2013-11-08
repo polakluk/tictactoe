@@ -7,6 +7,7 @@
 		<div class="row">
 				<div class="col-lg-6">
 					<?php echo Base::instance()->raw($desk); ?>
+					<?php echo $this->render('views/game/msgs.htm',$this->mime,get_defined_vars()); ?>
 				</div>
 				
 				<div class="col-lg-4 col-lg-offset-2">
@@ -15,4 +16,3 @@
 		</div>
 
 	</div>
-	<a href="<?php echo $BASE; ?>/game/leave/<?php echo $game_id; ?>" class="btn btn-info pull-right">Leave the Game</a>	

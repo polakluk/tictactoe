@@ -2,7 +2,7 @@
 	<div class="panel-heading">
     	<h3 class="panel-title">Game #<?php echo $game_id; ?></h3>
   	</div>
-	<table class="table table-bordered text-center table-desk">
+	<table class="table table-bordered text-center table-desk" data-enabled="1" data-game="<?php echo $game_id; ?>">
 		<?php foreach (($game_table?:array()) as $num_row=>$row): ?>
 			<tr class="game">
 				<?php foreach (($row?:array()) as $num_col=>$col): ?>

@@ -22,21 +22,78 @@ class GameController extends BaseController {
 		switch( $task ) {
 			case 'join' : // player wants to join a game
 				{
-					return $this->joinGame($param_list);
+					return $this->joinGame( $param_list );
 					break;
 				}
 			case 'show';
 				{
-					return $this->showGame($param_list);
+					return $this->showGame( $param_list );
 					break;
 				}
 			case 'leave': // player wants to leave a game
 				{
-					return $this->leaveGame($param_list);
+					return $this->leaveGame( $param_list );
+					break;
+				}
+			case 'makeMove' :
+				{
+					return $this->makeMove( $param_list );
 					break;
 				}
 		}
 		return false;
+	}
+
+	/*
+	 * This method tries to save the move. If it's not possible, it notifies use about the issue
+	 */
+	private function makeMove( $param_list ) {
+		$row = $this->f3->get( "POST.row" );
+		$col = $this->f3->get( "POST.col" );
+		$game_id = $this->f3->get( "POST.game" );
+		
+		$model = new \Models\MoveModel( $this->f3, $this->db );
+		$exists = $model->CheckExistence( $game_id, $row, $col );
+		$this->output_format = \Tools::OUTPUT_FORMAT_RAW;
+		$players = 1;
+		
+		$msg = array();
+		switch( $exists )
+		{
+			case \Tools::MOVE_STATE_NONE:
+				{
+					if( $players > 1 ) {
+						$msg[0] = 'Your move has been announced to your teammates. Wait for their evaluation!';
+						$msg[1] = 'primary';						
+					} else {
+						$msg[0] = 'Your move has been successfully recorded!';
+						$msg[1] = 'success';
+					}
+					break;
+				}
+			case \Tools::MOVE_STATE_TMP:
+				{
+					$msg[0] = 'Somebdy from your team has alraedy selected this field!';
+					$msg[1] = 'warning';
+					break;
+				}
+			case \Tools::MOVE_STATE_DONE:
+			default:
+				{
+					$msg[0] = 'This field is already occupied!';
+					$msg[1] = 'danger';
+					break;
+				}
+		}
+		
+		$result = new \stdClass();
+		$result->state = $exists;
+		$this->f3->set( 'msg_text', $msg[0] );
+		$this->f3->set( 'msg_type', $msg[1] );
+		$result->html = \Template::instance()->render( 'views/game/msg.htm' );
+		$this->f3->clear( 'msg_text' );
+		$this->f3->clear( 'msg_type' );
+		return json_encode($result);
 	}
 
 	/*
@@ -80,7 +137,7 @@ class GameController extends BaseController {
 		
 		$members = array( 3, 4, 5 );
 		$this->f3->set( 'members', $members );
-		
+
 		return 'views/game/main.htm';
 	}
 	

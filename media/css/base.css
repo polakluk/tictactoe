@@ -13,7 +13,12 @@ div.poll div.poll-time span#poll-time{
 	font-size : 22px;
 }
 
-div.container-game .table-desk td.empty:hover{
+div.container-game .table-desk[data-enabled="1"] td.empty:hover{
 	background : RGB( 226, 245, 250);
 	cursor : hand;
+}
+
+div.container-game .panel-msg{
+	height : 180px;
+	overflow-y : scroll;
 }
