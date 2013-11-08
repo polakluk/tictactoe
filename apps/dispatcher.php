@@ -46,16 +46,39 @@ class Dispatcher {
 		if( $render === false ) { // we carried out the task and the controller is requesting rediretion
 			return;
 		} else { // nah, we'll show everything right now
-			$this->f3->set( 'page_body', $render );
 			$this->f3->set( 'controller', $controller );
 			$this->f3->set( 'view', $c->view );
 			
-			if( $c->output_type == 'template' ) {
-				echo \Template::instance()->render( $this->f3->get('template') );				
+			$renderer = null;
+			if( $c->output_type == \Tools::OUTPUT_TEMPLATE ) { // template
+				$renderer = \Template::instance();
 			} else { // View
-				echo \View::instance()->render( $this->f3->get('template') );				
+				$renderer = \View::instance();
 			}
-			$this->f3->set( 'SESSION.msgs', array() );
+			
+			switch( $c->output_format ) {
+				default:
+				case Tools::OUTPUT_FORMAT_NORMAL:
+					{
+						$this->f3->set( 'page_body', $render );
+						$this->f3->set( 'whole_page', true );
+						echo $renderer->render( $this->f3->get('template') );
+						$this->f3->set( 'SESSION.msgs', array() );
+						break;
+					}
+				case Tools::OUTPUT_FORMAT_RAW :
+					{
+						echo $render;
+						break;
+					}
+				case Tools::OUTPUT_FORMAT_VIEW:
+					{
+						$this->f3->set( 'page_body', $render );
+						$this->f3->set( 'whole_page', false );
+						echo $renderer->render( $this->f3->get('template') );
+						break;
+					}
+			}
 		}		
 	}
 }

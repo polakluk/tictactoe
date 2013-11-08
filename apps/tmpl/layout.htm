@@ -1,3 +1,5 @@
+<check if="{{ @whole_page }}">
+	<true>
 <html lang="en">
 	<head>
 		<include href="tmpl/head.htm" />
@@ -6,8 +8,14 @@
 	<body>
 		<div class="lg-col-1 container container-{{ @controller }} container-{{ @controller }}-{{ @view }}">
 			<include href="tmpl/header.htm" />
+	</true>
+</check>
 			<include if="{{ @page_body }}" href="{{ @page_body }}" />
+
+<check if="{{ @whole_page }}">
+<true>
 			<include href="tmpl/footer.htm" />		
 		</div>
 	</body>
 </html>
+</true>

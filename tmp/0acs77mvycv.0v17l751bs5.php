@@ -8,3 +8,4 @@
 <script src="<?php echo $BASE; ?>/media/js/jquery.js" type="text/javascript"></script>
 <script src="<?php echo $BASE; ?>/media/bootstrap/js/bootstrap.js" type="text/javascript"></script>
 <script src="<?php echo $BASE; ?>/media/js/main.js" type="text/javascript"></script>
+<script src="<?php echo $BASE; ?>/media/js/game.js" type="text/javascript"></script>

@@ -8,7 +8,9 @@ abstract class BaseController {
 	
 	protected $db; // instance of the DB class
 	
-	public $output_type = 'template'; // which template preprocessor should be used to render the current view ('template' / 'view')
+	public $output_type = \Tools::OUTPUT_TEMPLATE; // which template preprocessor should be used to render the current view ('template' / 'view')
+	public $output_format = \Tools::OUTPUT_FORMAT_NORMAL; // type of the output
+		
 	
 	public $view = 'main'; // which view is being displayed ( 'main' is default )
 
