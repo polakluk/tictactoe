@@ -45,5 +45,11 @@ abstract class BaseModel{
 	/*
 	 * Gets a list of items based on the conditions
 	 */
-	abstract public function GetList();
+	public function GetList()
+	{
+		$results = new \DB\SQL\Mapper( $this->db, $this->table );
+		$results->load();
+
+		return $results;		
+	}
 }

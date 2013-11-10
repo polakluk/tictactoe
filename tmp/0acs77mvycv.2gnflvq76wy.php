@@ -1,5 +1,6 @@
 <?php if ($whole_page): ?>
 	
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<?php echo $this->render('tmpl/head.htm',$this->mime,get_defined_vars()); ?>

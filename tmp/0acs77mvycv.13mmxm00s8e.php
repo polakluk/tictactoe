@@ -8,27 +8,27 @@
 				    <h3 class="panel-title">Welcome!</h3>
 				  </div>
 				  <div class="panel-body">
-				  	<check if="{{@username}}">
-				  		<true>
+				  	<?php if ($username): ?>
+				  		
 				  			<div class="well-lg">
-							  	<form action="{{ @BASE }}/home/create_user" method="POST" class="form-horizontal" role="form">
+							  	<form action="<?php echo $BASE; ?>/home/create_user" method="POST" class="form-horizontal" role="form">
 								  	<div class="form-group">
 										<div class="input-group">
 											<span class="input-group-addon">Your name</span>
-											<input type="text" class="form-control" disabled="true" value="{{ @username }}" name="username" id="username" />
+											<input type="text" class="form-control" disabled="true" value="<?php echo $username; ?>" name="username" id="username" />
 											<div class="input-group-btn">
-												<a href="{{ @BASE }}/home/reset" class="btn btn-danger" alt="Change">Change name</a>
-												<a href="{{ @BASE }}/showroom" class="btn btn-info" alt="Go">Go!</a>
+												<a href="<?php echo $BASE; ?>/home/reset" class="btn btn-danger" alt="Change">Change name</a>
+												<a href="<?php echo $BASE; ?>/showroom" class="btn btn-info" alt="Go">Go!</a>
 										  	</div>
 					 					</div>
 					 				</div>
 					 			</form>
 					 		</div>
-				  		</true>
 				  		
-				  		<false>
+				  		
+				  		<?php else: ?>
 				  			<div class="well-lg">
-							  	<form action="{{ @BASE }}/home/create_user" method="POST" class="form-horizontal" role="form">
+							  	<form action="<?php echo $BASE; ?>/home/create_user" method="POST" class="form-horizontal" role="form">
 								  	<div class="form-group">
 										<div class="input-group">
 											<span class="input-group-addon">Your name</span>
@@ -40,8 +40,8 @@
 								  	</div>
 							  	</form>
 						  	</div>
-				  		</false>
-				  	</check>
+				  		
+				  	<?php endif; ?>
 				  </div>
 				</div>
 
@@ -55,8 +55,8 @@
 				  </div>
 				  <div class="panel-body text-center">
 					<div class="btn-group btn-group-justified">
-						<a href="{{ @BASE }}/showroom/spectator" class="btn btn-success btn-lg">See Games</a>
-						<a href="{{ @BASE }}/rules" class="btn btn-danger btn-lg">See Rules</a>
+						<a href="<?php echo $BASE; ?>/showroom/spectator" class="btn btn-success btn-lg">See Games</a>
+						<a href="<?php echo $BASE; ?>/rules" class="btn btn-danger btn-lg">See Rules</a>
 					</div>
 				  </div>
 				</div>

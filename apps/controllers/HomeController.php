@@ -14,20 +14,60 @@ class HomeController extends BaseController {
 		switch( $task ) {
 			case 'create_user':
 				{
-					$this->f3->set( 'SESSION.username', $this->f3->get( 'POST.username' ) );
-					$this->f3->reroute( '/showroom' );
-					return false;
+					return $this->createUser();
 					break;
 				}
 			case 'reset' :
 				{
-					$this->f3->clear( 'SESSION.username' );					
+					return $this->resetUser();
+					break;
 				}
 			default:
 				{
-					$this->f3->set( 'username', $this->f3->get( 'SESSION.username' ) );
-					return 'views/home/main.htm';					
+					$model = new \Models\PlayerModel( $this->f3, $this->db );
+					$player = $model->GetCurrentPlayer();
+					$this->f3->set( 'username', $player->name );
+					return 'views/home/main.htm';
 				}
 		}
 	}
+	
+	/*
+	 * This method takes care of all operations required to create a player
+	 */
+	 private function createUser() {
+	 	return $this->modifyUser( $this->f3->get( 'POST.username' ) );
+	 }
+
+	/*
+	 * This method takes care of all operations required to reset a player
+	 */
+	 private function resetUser() {
+	 	return $this->modifyUser( '' );
+	 }	 
+	 
+	 /*
+	  * This method generalize way of working with player object
+	  */
+	 private function modifyUser( $username ){
+		$model = new \Models\PlayerModel( $this->f3, $this->db );
+		$player = $model->GetCurrentPlayer();
+		$table = new \DB\SQL\Mapper( $this->db, 'players' );
+		$table->load( $player->id );
+		if( !$player->id ) { // just came to the site
+			$table->player_joined = date( 'Y-m-d H:i:s', time() );
+		}
+		$table->player_name = $username;
+		if( strlen( $username ) ) {
+			$table->save();
+		} else {
+			$table->erase();
+		}
+		
+		$player->id = $table->player_id;
+		$player->name = $username;
+		$model->StoreCurrentPlayer( $player );
+		$this->f3->reroute( '/' );
+		return false;	 	
+	 }
 }
