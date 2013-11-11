@@ -36,6 +36,11 @@ class HomeController extends BaseController {
 	 * This method takes care of all operations required to create a player
 	 */
 	 private function createUser() {
+	 	if( strlen( $this->f3->get( 'POST.username' )) == 0 ) {
+	 		\Tools::EnqueueMessage( 'You are trying to create a player without a name. Please specify your name', 'danger');
+	 		$this->f3->reroute( '/' );
+	 		return  false;
+	 	}
 	 	return $this->modifyUser( $this->f3->get( 'POST.username' ) );
 	 }
 

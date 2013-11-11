@@ -18,4 +18,11 @@ abstract class Tools{
 		MOVE_STATE_TMP = 2, // the move exists but it's not final yet
 		
 		last = ''; // so I dont have to bother with commas
+
+		/*
+		 * Enqueues the message to queue of all messages on the site
+		 */
+		static public function EnqueueMessage( $msg, $type = 'info' ) {
+			Base::instance()->push( 'SESSION.msgs', array( $msg, $type) );
+		}
 }

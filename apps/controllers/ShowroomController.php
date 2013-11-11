@@ -14,10 +14,13 @@ class ShowroomController extends BaseController {
 		$params = $this->f3->get('PARAMS');
 		$task = isset( $params['task'] ) ? $params['task'] : '';
 		
-		$spectator = !empty( $task ) || $this->f3->get( 'SESSION.username' ) == '';
+		$model_player = new \Models\PlayerModel( $this->f3, $this->db );
+		$player = $model_player->GetCurrentPlayer();
+		
+		$spectator = !empty( $task ) || $player->name == '';
 		
 		$this->f3->set( 'join_game', !$spectator );
-		$this->f3->set('game_username', $spectator ? '<<spectator>>' : $this->f3->get( 'SESSION.username' ) );
+		$this->f3->set('game_username', $spectator ? '<<spectator>>' : $player->name );
 		$desks = array();
 		$games = $this->getGames();
 		for( $i = 0; $i < 2; $i++ ) {
