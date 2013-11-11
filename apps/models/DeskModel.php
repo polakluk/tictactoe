@@ -76,9 +76,32 @@ class DeskModel extends BaseModel{
 	}
 	
 	/*
-	 * Get numbers of playes in red and blue teams (and spectators)
+	 * Get numbers of playes in red and blue teams (and spectators) - team 0 means all kinds of players
 	 */
-	public function GetNumberPlayers( $id ) {
-		return array( 3, 4, 5 );
+	public function GetNumberPlayers( $id, $team = 0 ) {
+		$result = array();
+		
+		$results = new \DB\SQL\Mapper( $this->db, 'games_players_xref' );
+		$conditions = array();
+		if( $team == 0 ) {
+			$result = array(
+				\Tools::TEAM_BLUE_SQL => 0,
+				\Tools::TEAM_RED_SQL => 0,
+				\Tools::TEAM_SPEC_SQL => 0
+					);
+
+			$results->players = 'COUNT(player_id)';
+			$results->load( array( 'game_id = ?', $id ), array( 'group' => 'player_team' ) );
+			while( !$results->dry() ) {
+				$result[ $results->player_team ] = $results->players;
+				$results->skip(1);
+			}
+		} else {
+			$results->players = 'COUNT(player_id)';
+			$results->load( array( 'game_id = ? AND player_team = ?', $id, $team ), array( 'group' => 'player_team' ) );
+			$result = $results->players;
+		}
+		
+		return $result;
 	}
 }

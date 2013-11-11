@@ -54,10 +54,9 @@ class GameController extends BaseController {
 	private function makeMove( $param_list ) {
 		$row = $this->f3->get( "POST.row" );
 		$col = $this->f3->get( "POST.col" );
-		$game_id = $this->f3->get( "POST.game" );
 		
 		$model = new \Models\MoveModel( $this->f3, $this->db );
-		$exists = $model->CheckExistence( $game_id, $row, $col );
+		$exists = $model->CheckExistence( $this->player->game, $row, $col );
 		$this->output_format = \Tools::OUTPUT_FORMAT_RAW;
 		$players = 1;
 		
@@ -203,7 +202,6 @@ class GameController extends BaseController {
 		
 		$members = $model->GetNumberPlayers( $id );
 		$this->f3->set( 'members', $members );
-
 		return 'views/game/main.htm';
 	}
 	

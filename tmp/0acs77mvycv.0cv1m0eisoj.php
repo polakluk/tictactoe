@@ -48,17 +48,17 @@
   	</div>
   	<div class="panel-body">
   		<table class="table table-striped table-teams">
-  			<tr data-team="red">
+  			<tr data-team="2">
   				<td style="width 60px;">Red: </td>
-  				<td><?php echo $members['0']; ?></td>
+  				<td><?php echo $members['2']; ?></td>
   			</tr>
-  			<tr data-team="blue">
+  			<tr data-team="1">
   				<td style="width 60px;">Blue: </td>
   				<td><?php echo $members['1']; ?></td>
   			</tr>
-  			<tr data-team="spectators">
+  			<tr data-team="3">
   				<td style="width 60px;">Spectators: </td>
-  				<td><?php echo $members['2']; ?></td>
+  				<td><?php echo $members['3']; ?></td>
   			</tr>
   		</table>
 	</div>
