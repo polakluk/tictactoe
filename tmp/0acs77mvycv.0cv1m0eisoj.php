@@ -11,7 +11,7 @@
   			<tr id="trTeam">
   				<td style="width : 50px;">Team</td>
   				<td>
-  					<?php if ($game_team == 'red'): ?>
+  					<?php if ($game_team == '2'): ?>
   						
 		  					<span class="label label-danger">Red</span>
   						
@@ -55,10 +55,6 @@
   			<tr data-team="1">
   				<td style="width 60px;">Blue: </td>
   				<td><?php echo $members['1']; ?></td>
-  			</tr>
-  			<tr data-team="3">
-  				<td style="width 60px;">Spectators: </td>
-  				<td><?php echo $members['3']; ?></td>
   			</tr>
   		</table>
 	</div>

@@ -11,7 +11,7 @@
   			<tr id="trTeam">
   				<td style="width : 50px;">Team</td>
   				<td>
-  					<check if="{{ @game_team == 'red' }}">
+  					<check if="{{ @game_team == '2' }}">
   						<true>
 		  					<span class="label label-danger">Red</span>
   						</true>
@@ -82,10 +82,6 @@
   			<tr data-team="1">
   				<td style="width 60px;">Blue: </td>
   				<td>{{ @members[1] }}</td>
-  			</tr>
-  			<tr data-team="3">
-  				<td style="width 60px;">Spectators: </td>
-  				<td>{{ @members[3] }}</td>
   			</tr>
   		</table>
 	</div>

@@ -1,11 +1,17 @@
 	<div class="page-header text-center">
 	<h1>Game <small>{{ @game_username }}
-		<check if="{{ @player_team == 'red' }}">
-			<true>
-				<span class="label label-danger">Red</span>
-			</true>
+		
+		<check if="{{ @spectator }}">
+			<true> </true>
 			<false>
-				<span class="label label-primary">Blue</span>
+				<check if="{{ @player_team == 2 }}">
+					<true>
+						<span class="label label-danger">Red</span>
+					</true>
+					<false>
+						<span class="label label-primary">Blue</span>
+					</false>
+				</check>
 			</false>
 		</check>
 		</small></h1>

@@ -25,7 +25,6 @@ abstract class Tools{
 		// teams (DB)
 		TEAM_BLUE_SQL = 1,
 		TEAM_RED_SQL = 2,
-		TEAM_SPEC_SQL = 3,
 		
 		last = ''; // so I dont have to bother with commas
 

@@ -1,11 +1,17 @@
 	<div class="page-header text-center">
 	<h1>Game <small><?php echo $game_username; ?>
-		<?php if ($player_team == 'red'): ?>
-			
-				<span class="label label-danger">Red</span>
-			
+		
+		<?php if ($spectator): ?>
+			 
 			<?php else: ?>
-				<span class="label label-primary">Blue</span>
+				<?php if ($player_team == 2): ?>
+					
+						<span class="label label-danger">Red</span>
+					
+					<?php else: ?>
+						<span class="label label-primary">Blue</span>
+					
+				<?php endif; ?>
 			
 		<?php endif; ?>
 		</small></h1>

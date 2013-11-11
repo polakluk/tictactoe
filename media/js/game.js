@@ -20,12 +20,9 @@ Game.BindEvents = function() {
 	Game.elements.desk.on( 'click', 'td.empty', function( e ) {
 		var obj = $( this );
 		var post_data = {
-			'game' : Game.elements.desk.attr( 'data-game' ),
 			'row' : obj.attr( 'data-row' ),
 			'col' : obj.attr( 'data-col' )
 					};
-		console.log( post_data );
-		
 		
 		$.ajax( {
 			'type' : 'POST',

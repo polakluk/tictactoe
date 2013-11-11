@@ -58,7 +58,9 @@ class GameController extends BaseController {
 		$model = new \Models\MoveModel( $this->f3, $this->db );
 		$exists = $model->CheckExistence( $this->player->game, $row, $col );
 		$this->output_format = \Tools::OUTPUT_FORMAT_RAW;
-		$players = 1;
+
+		$model_desk = new \Models\DeskModel( $this->f3, $this->db );
+		$players = $model_desk->GetNumberPlayers( $this->player->game, $this->player->team );
 		
 		$msg = array();
 		switch( $exists )
@@ -116,12 +118,6 @@ class GameController extends BaseController {
 	private function leaveGame( $param_list ) {
 		$id = (int)$param_list[0];
 
-		if( $this->player->name == '' ) {
-			\Tools::EnqueueMessage( 'You cannot leave the game unless you create your name. At this point, you can only spectate games', 'danger' );
-			$this->f3->reroute( '/showroom' );
-			return false;
-		}
-
 		if( $this->player->game == 0 ) {
 			\Tools::EnqueueMessage( 'Currently, you are not playing any game which you could leave.', 'danger' );
 			$this->f3->reroute( '/showroom' );
@@ -154,7 +150,7 @@ class GameController extends BaseController {
 			$this->f3->reroute( '/showroom' );
 			return false;
 		}
-		$this->player->team = $team == \Tools::TEAM_RED ? \Tools::TEAM_RED : \Tools::TEAM_BLUE;
+		$this->player->team = $team == \Tools::TEAM_RED ? \Tools::TEAM_RED_SQL : \Tools::TEAM_BLUE_SQL;
 		$this->player->game = $id;
 		$this->model_player->StoreCurrentPlayer( $this->player );
 
@@ -184,11 +180,17 @@ class GameController extends BaseController {
 			return false;
 		}
 
-		$table_xref = new \DB\SQL\Mapper( $this->db, 'games_players_xref' );
-		$table_xref->load( array( 'game_id = ? AND player_id = ?', $id, $this->player->id ) );
-		$this->player->team = $table_xref->player_team == \Tools::TEAM_RED_SQL ? \Tools::TEAM_RED : \Tools::TEAM_BLUE;
-		$this->player->game = $table_xref->game_id;
-		$this->model_player->StoreCurrentPlayer( $this->player );
+		if( $this->f3->get( 'spectator' ) ) {
+			echo 'adfasfss';
+			$this->player->game = $id;
+			$this->model_player->StoreCurrentPlayer( $this->player );
+		} else {			
+			$table_xref = new \DB\SQL\Mapper( $this->db, 'games_players_xref' );
+			$table_xref->load( array( 'game_id = ? AND player_id = ?', $id, $this->player->id ) );
+			$this->player->team = $table_xref->player_team == \Tools::TEAM_RED_SQL ? \Tools::TEAM_RED : \Tools::TEAM_BLUE;
+			$this->player->game = $table_xref->game_id;
+			$this->model_player->StoreCurrentPlayer( $this->player );
+		}
 
 		$this->f3->set( 'game_id', $game->info->game_id );
 		$this->f3->set( 'game_turn', $game->info->game_turn );

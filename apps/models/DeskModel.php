@@ -86,8 +86,7 @@ class DeskModel extends BaseModel{
 		if( $team == 0 ) {
 			$result = array(
 				\Tools::TEAM_BLUE_SQL => 0,
-				\Tools::TEAM_RED_SQL => 0,
-				\Tools::TEAM_SPEC_SQL => 0
+				\Tools::TEAM_RED_SQL => 0
 					);
 
 			$results->players = 'COUNT(player_id)';
