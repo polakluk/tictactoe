@@ -58,7 +58,7 @@ class HomeController extends BaseController {
 		$model = new \Models\PlayerModel( $this->f3, $this->db );
 		$player = $model->GetCurrentPlayer();
 		$table = new \DB\SQL\Mapper( $this->db, 'players' );
-		$table->load( $player->id );
+		$table->load( array( 'player_id = ? ', $player->id) );
 		if( !$table->player_id ) { // just came to the site
 			$table->player_joined = date( 'Y-m-d H:i:s', time() );
 		}

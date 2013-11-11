@@ -159,7 +159,7 @@ class GameController extends BaseController {
 		$table_xref->load( array( 'game_id = ? AND player_id = ?', $id, $this->player->id ) );
 		$table_xref->game_id = $id;
 		$table_xref->player_id = $this->player->id;
-		$table_xref->player_team = $this->player->team == \Tools::TEAM_RED ? \Tools::TEAM_RED_SQL : \Tools::TEAM_BLUE_SQL;
+		$table_xref->player_team = $this->player->team == \Tools::TEAM_RED_SQL ? \Tools::TEAM_RED_SQL : \Tools::TEAM_BLUE_SQL;
 		$table_xref->save();
 		
 		\Tools::EnqueueMessage( 'You joined the game.' );
@@ -181,13 +181,12 @@ class GameController extends BaseController {
 		}
 
 		if( $this->f3->get( 'spectator' ) ) {
-			echo 'adfasfss';
 			$this->player->game = $id;
 			$this->model_player->StoreCurrentPlayer( $this->player );
 		} else {			
 			$table_xref = new \DB\SQL\Mapper( $this->db, 'games_players_xref' );
 			$table_xref->load( array( 'game_id = ? AND player_id = ?', $id, $this->player->id ) );
-			$this->player->team = $table_xref->player_team == \Tools::TEAM_RED_SQL ? \Tools::TEAM_RED : \Tools::TEAM_BLUE;
+			$this->player->team = $table_xref->player_team;
 			$this->player->game = $table_xref->game_id;
 			$this->model_player->StoreCurrentPlayer( $this->player );
 		}
