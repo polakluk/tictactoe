@@ -23,7 +23,8 @@ Game.BindEvents = function() {
 		var obj = $( this );
 		var post_data = {
 			'row' : obj.attr( 'data-row' ),
-			'col' : obj.attr( 'data-col' )
+			'col' : obj.attr( 'data-col' ),
+			'turn' : Game.elements.td_turn.attr( 'data-turn' )
 					};
 		
 		$.ajax( {
@@ -52,6 +53,8 @@ Game.FieldClick = function( data ) {
 			}
 		case 2: // game is over
 			{
+				Game.MarkField( data.row, data.col, data.game, data.team );
+				Game.UpdateStats( data.turn, data.team );
 				break;
 			}
 		case 3: // the poll is on
@@ -71,6 +74,7 @@ Game.UpdateStats = function( turn, team ) {
 	}
 	Game.elements.td_team.html( obj );
 	Game.elements.td_turn.html( turn );
+	Game.elements.td_turn.attr( 'data-turn', turn );
 }
 
 Game.MarkField = function( row, col, game, team ) {
@@ -81,7 +85,7 @@ Game.MarkField = function( row, col, game, team ) {
 		obj = $('<img/>', { 'alt' : 'Red', 'src' : base_url+'/media/images/red.png' } );		
 	}
 	obj_td = $( 'table[data-game="'+game+'"] td[data-col="'+col+'"][data-row="'+row+'"]' );
-	obj.appendTo( obj_td );
+	obj.html( obj_td );
 	obj_td.removeClass( 'empty' );
 }
 

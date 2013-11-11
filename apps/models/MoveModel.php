@@ -41,10 +41,16 @@ class MoveModel extends BaseModel{
 	/*
 	 * This method checks, if this move already exists on the desk. Returns true, if the move already exists
 	 */
-	public function CheckExistence( $game_id, $row, $col ){
+	public function CheckExistence( $game_id, $row, $col, $turn ){
 		$table = new \DB\SQL\Mapper( $this->db, $this->table );
-		$table->load( array( 'game_id = ? AND row = ? AND col = ?', $game_id, $row, $col ) );
-	
-		return $table->dry() ? 0 : $table->state;
+		$table->load( array( 'game_id = ? AND turn = ?', $game_id, $turn ) );
+		if( empty( $table->move_id ) ) {
+			$table->reset();
+			$table = new \DB\SQL\Mapper( $this->db, $this->table );
+			$table->load( array( 'game_id = ? AND row = ? AND col = ?', $game_id, $row, $col ) );
+			return $table->dry() ? 0 : $table->state;
+		} else { // somebody already marked a move
+			return -1;
+		}	
 	}
 }

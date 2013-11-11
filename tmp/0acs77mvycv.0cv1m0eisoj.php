@@ -6,7 +6,7 @@
   		<table class="table table-striped">
   			<tr id="trTurn">
   				<td style="width : 50px;">Turn</td>
-  				<td><?php echo $game_turn; ?></td>
+  				<td data-turn="<?php echo $game_turn; ?>"><?php echo $game_turn; ?></td>
   			</tr>
   			<tr id="trTeam">
   				<td style="width : 50px;">Team</td>

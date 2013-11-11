@@ -53,12 +53,24 @@ class GameController extends BaseController {
 	 */
 	private function makeMove( $param_list ) {
 		$state = 0;
-		$row = $this->f3->get( "POST.row" );
-		$col = $this->f3->get( "POST.col" );
+		$row = (int)$this->f3->get( "POST.row" );
+		$col = (int)$this->f3->get( "POST.col" );
+		$turn = (int)$this->f3->get( 'POST.turn' );
 
 		$model = new \Models\MoveModel( $this->f3, $this->db );
-		$exists = $model->CheckExistence( $this->player->game, $row, $col );
+		$exists = $model->CheckExistence( $this->player->game, $row, $col, $turn );
 		$this->output_format = \Tools::OUTPUT_FORMAT_RAW;
+		
+		if( $exists == -1 ) { // somebody already marked a move
+			$result = new \stdClass();
+			$result->state = 0;
+			$this->f3->set( 'msg_text', 'Sorry mate, but somebody from your team has alraedy marked a move!' );
+			$this->f3->set( 'msg_type', 'danger' );
+			$result->html = \Template::instance()->render( 'views/game/msg.htm' );
+			$this->f3->clear( 'msg_text' );
+			$this->f3->clear( 'msg_type' );
+			return json_encode($result);			 
+		}
 
 		$model_desk = new \Models\DeskModel( $this->f3, $this->db );
 		$game = $model_desk->GetItem( $this->player->game, true );
@@ -72,6 +84,18 @@ class GameController extends BaseController {
 			$this->f3->clear( 'msg_type' );
 			return json_encode($result);
 		}
+
+		if( $game->game_ended == 1 ) { // the game already ended
+			$result = new \stdClass();
+			$result->state = 2;
+			$this->f3->set( 'msg_text', 'The game is already done' );
+			$this->f3->set( 'msg_type', 'success' );
+			$result->html = \Template::instance()->render( 'views/game/msg.htm' );
+			$this->f3->clear( 'msg_text' );
+			$this->f3->clear( 'msg_type' );
+			return json_encode($result);
+		}
+
 		
 		$players = $model_desk->GetNumberPlayers( $this->player->game, $this->player->team );
 		
@@ -97,8 +121,32 @@ class GameController extends BaseController {
 						$table->team = $this->player->team;
 						$table->created = date( 'Y-m-d H:i:s', time() );
 						$table->state = \Tools::MOVE_STATE_DONE;
+						$table->turn = $game->game_turn;
 						$table->save();
 						
+						// check, if the game is not over
+						$res = $this->checkGame( $this->player->game, $row, $col );
+						
+						if( $res->done ) { // we won :)
+							$result = new \stdClass();
+							$result->state = 2;
+							$result->fields = \Tools::CONNECT_FIELDS;
+							$result->start_row = $res->row;
+							$result->start_col = $res->col;
+							$result->dir = $res->dir;
+							$result->row = $row;
+							$result->col = $col;
+							$result->turn = $game->game_turn;
+							$result->team = $game->game_team;
+							$result->game = $this->player->game;
+
+							$this->f3->set( 'msg_text', 'Game is over! The winner is team '.$res->winner.'. Feel free to play another game.' );
+							$this->f3->set( 'msg_type', 'success' );
+							$result->html = \Template::instance()->render( 'views/game/msg.htm' );
+							$this->f3->clear( 'msg_text' );
+							$this->f3->clear( 'msg_type' );
+							return json_encode($result);
+						}
 						
 						// update game stats
 						$game->game_turn++;
@@ -247,6 +295,60 @@ class GameController extends BaseController {
 			$game->team = $i ? 'red' : 'blue';
 			
 			$result []= $game;
+		}
+		
+		return $result;
+	}
+
+	/*
+	 * Checks, if the game is not over at this point
+	 */
+	private function checkGame( $id, $row, $col ) {
+		$result = new \stdClass();
+		$result->row = 0;
+		$result->col = 0;
+		$result->dir = 0;
+		$result->winner = '';
+		$result->done = false;
+		
+		$model = new \Models\DeskModel( $this->f3, $this->db );
+		$game = $model->GetItem( $id );
+		$team = $this->player->team;
+		
+		$dir = array( // row, col, dir
+				array( 1, 0, 0), //vertical line
+				array( 0, 1, 1), // horizontal line
+				array( -1, 1, 2), // top-left => bottom-right
+				array( 1, -1, 3) // bottom-left => top-right
+					);
+					
+		// check moves in all directions
+		for( $i = 0, $c = count( $dir ); $i < $c; $i++ ) {
+			$fields = 1;
+			$act_row = $row + $dir[$i][0];
+			$act_col = $col + $dir[$i][1];
+			while( isset( $game->desk[$act_row][$act_col] ) && $game->desk[$act_row][$act_col] == $team ){
+				$fields++;
+				$act_row += $dir[$i][0];
+				$act_col += $dir[$i][1];
+			}
+			$result->row = $act_row - $dir[$i][0];
+			$result->col = $act_col - $dir[$i][1];
+			
+			$act_row = $row - $dir[$i][0];
+			$act_col = $col - $dir[$i][1];
+			while( isset( $game->desk[$act_row][$act_col] ) && $game->desk[$act_row][$act_col] == $team ){
+				$fields++;
+				$act_row -= $dir[$i][0];
+				$act_col -= $dir[$i][1];
+			}
+			
+			if( $fields >= \Tools::CONNECT_FIELDS ){
+				$result->dir = $i;
+				$result->winner = $team == \Tools::TEAM_RED_SQL ? \Tools::TEAM_RED : \Tools::TEAM_BLUE;
+				$result->done = true;
+				return $result;	
+			}
 		}
 		
 		return $result;
