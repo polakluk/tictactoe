@@ -18,6 +18,11 @@ div.container-game .table-desk[data-enabled="1"] td.empty:hover{
 	cursor : hand;
 }
 
+div.container-game .table-desk[data-enabled="1"] td.winner{
+	background : rgb( 208, 243, 253);
+	cursor : default;
+}
+
 div.container-game .panel-msg{
 	height : 180px;
 	overflow-y : scroll;

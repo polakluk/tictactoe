@@ -137,7 +137,7 @@ class GameController extends BaseController {
 							$result->row = $row;
 							$result->col = $col;
 							$result->turn = $game->game_turn;
-							$result->team = $game->game_team;
+							$result->team = $this->player->team;
 							$result->game = $this->player->game;
 
 							$this->f3->set( 'msg_text', 'Game is over! The winner is team '.$res->winner.'. Feel free to play another game.' );
@@ -176,7 +176,7 @@ class GameController extends BaseController {
 		$result = new \stdClass();
 		$result->state = $state;
 		$result->turn = $game->game_turn;
-		$result->team = $game->game_team;
+		$result->team = $this->player->team;
 		$result->row = $row;
 		$result->col = $col;
 		$result->game = $this->player->game;
@@ -316,10 +316,10 @@ class GameController extends BaseController {
 		$team = $this->player->team;
 		
 		$dir = array( // row, col, dir
-				array( 1, 0, 0), //vertical line
-				array( 0, 1, 1), // horizontal line
-				array( -1, 1, 2), // top-left => bottom-right
-				array( 1, -1, 3) // bottom-left => top-right
+				array( -1, 0), //vertical line
+				array( 0, 1), // horizontal line
+				array( -1, -1), // top-left => bottom-right
+				array( 1, -1) // bottom-left => top-right
 					);
 					
 		// check moves in all directions

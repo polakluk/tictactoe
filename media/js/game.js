@@ -54,6 +54,7 @@ Game.FieldClick = function( data ) {
 		case 2: // game is over
 			{
 				Game.MarkField( data.row, data.col, data.game, data.team );
+				Game.MarkWinner(data.start_row, data.start_col, data.dir, data.game, data.fields );
 				Game.UpdateStats( data.turn, data.team );
 				break;
 			}
@@ -77,16 +78,35 @@ Game.UpdateStats = function( turn, team ) {
 	Game.elements.td_turn.attr( 'data-turn', turn );
 }
 
-Game.MarkField = function( row, col, game, team ) {
+Game.MarkWinner = function( row, col, d, game, num ) {
+	var dir = [ // row, col, dir
+			[ 1, 0 ], //vertical line
+			[ 0, -1 ], // horizontal line
+			[ 1, 1 ], // top-left => bottom-right
+			[ -1, 1 ] // bottom-left => top-right
+				];
+	
+	for( i = 0; i < num; i++ ) {
+		Game.FieldTd( row, col, game ).addClass( 'winner' );
+		row += dir[d][0];
+		col += dir[d][1];		
+	}
+}
+
+Game.MarkField = function( row, col, game, team) {
 	var obj;
-	if( team == 2 ){
+	if( team == 1 ){
 		obj = $('<img/>', { 'alt' : 'Blue', 'src' : base_url+'/media/images/blue.png' } );
 	} else {
 		obj = $('<img/>', { 'alt' : 'Red', 'src' : base_url+'/media/images/red.png' } );		
 	}
-	obj_td = $( 'table[data-game="'+game+'"] td[data-col="'+col+'"][data-row="'+row+'"]' );
-	obj.html( obj_td );
+	obj_td = Game.FieldTd( row, col, game );
+	obj_td.html( obj );
 	obj_td.removeClass( 'empty' );
+}
+
+Game.FieldTd = function( row, col, game ) {
+	return $( 'table[data-game="'+game+'"] td[data-col="'+col+'"][data-row="'+row+'"]' );
 }
 
 $(function(){
