@@ -1,5 +1,14 @@
 	<div class="page-header text-center">
-	<h1>Game <small><?php echo $game_username; ?></small></h1>
+	<h1>Game <small><?php echo $game_username; ?>
+		<?php if ($player_team == 'red'): ?>
+			
+				<span class="label label-danger">Red</span>
+			
+			<?php else: ?>
+				<span class="label label-primary">Blue</span>
+			
+		<?php endif; ?>
+		</small></h1>
 	</div>
 
 	<div class="container" style="padding: 0 30px 0px 0;">

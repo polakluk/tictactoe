@@ -5,6 +5,8 @@ namespace Models;
 class DeskModel extends BaseModel{
 		
 	public $table = 'games';
+	protected $primary_key = 'game_id';
+	
 	/*
 	 * Resets inner state of the model
 	 */
@@ -22,7 +24,9 @@ class DeskModel extends BaseModel{
 	 */
 	public function GetItem( $id ) {
 		$desk = parent::GetItem( $id );
-
+		if( $desk === false ) { // no game was found
+			return false;
+		}
 		$game = new \stdClass();
 		$game->info = clone $desk;
 		$game->desk = $this->GetDesk( $desk );
@@ -44,12 +48,14 @@ class DeskModel extends BaseModel{
 			}
 		}
 		// now load moves from the DB
-		$moves_model = new \Models\MoveModel( $this->f3, $this->db );
-		$moves_model->SetState( array( 'game_id' => $game->game_id ) );
-		$moves = $moves_model->GetList();
-		while( !$moves->dry() ) {
-			$result[$moves->row][$moves->col] = $moves->team;
-			$moves->skip(1);
+		if( $game->game_id > 0 ) {
+			$moves_model = new \Models\MoveModel( $this->f3, $this->db );
+			$moves_model->SetState( array( 'game_id' => $game->game_id ) );
+			$moves = $moves_model->GetList();
+			while( !$moves->dry() ) {
+				$result[$moves->row][$moves->col] = $moves->team;
+				$moves->skip(1);
+			}
 		}
 		return $result;
 	}
@@ -67,5 +73,12 @@ class DeskModel extends BaseModel{
 		);
 
 		return $results;
+	}
+	
+	/*
+	 * Get numbers of playes in red and blue teams (and spectators)
+	 */
+	public function GetNumberPlayers( $id ) {
+		return array( 3, 4, 5 );
 	}
 }

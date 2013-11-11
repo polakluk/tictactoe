@@ -3,6 +3,10 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
+		
+		<script>
+			var base_url = '<?php echo $BASE; ?>';
+		</script>
 		<?php echo $this->render('tmpl/head.htm',$this->mime,get_defined_vars()); ?>
 	</head>
 	

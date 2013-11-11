@@ -30,7 +30,6 @@ class PlayerModel extends BaseModel{
 	private function createEmptyPlayerObject(){
 		$obj = new \stdClass();
 		$obj->id = 0;
-		$obj->joined = '';
 		$obj->name = '';
 		$obj->team = '';
 		$obj->game = 0;

@@ -42,13 +42,16 @@
 		</repeat>
 		
 			<tr>
-				<td colspan="3">
-			  		<a href="{{ @BASE }}/game/join/{{ @game_id }}" class="btn btn-success pull-right">
+				<td colspan="100">
 						<check if="{{ @join_game}}">
-							<true>Join game</true>
-							<false>Spectate game</false>
+							<true>
+								<a href="{{ @BASE }}/game/join/{{ @game_id }}/blue" class="btn btn-primary">Join Blue team</a>
+								<a href="{{ @BASE }}/game/join/{{ @game_id }}/red" class="btn btn-danger">Join Red team</a>
+							</true>
+							<false>
+						  		<a href="{{ @BASE }}/game/show/{{ @game_id }}" class="btn btn-success">Spectate game</a>
+							</false>
 						</check>
-			  		</a>				
 				</td>
 			</tr>
 	</table>

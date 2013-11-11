@@ -59,7 +59,7 @@ class HomeController extends BaseController {
 		$player = $model->GetCurrentPlayer();
 		$table = new \DB\SQL\Mapper( $this->db, 'players' );
 		$table->load( $player->id );
-		if( !$player->id ) { // just came to the site
+		if( !$table->player_id ) { // just came to the site
 			$table->player_joined = date( 'Y-m-d H:i:s', time() );
 		}
 		$table->player_name = $username;

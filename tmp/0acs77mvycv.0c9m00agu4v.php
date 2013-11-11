@@ -9,7 +9,7 @@
 			<?php foreach (($desks?:array()) as $desk): ?>
 				<div class="col-lg-6">
 					<?php echo Base::instance()->raw($desk); ?>
-				</div>    
+				</div>
 			<?php endforeach; ?>
 
 		</div>

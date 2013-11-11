@@ -7,8 +7,10 @@ abstract class BaseModel{
 	protected $f3; // instance of the base F3 class
 	protected $db; // instance of the db class
 	protected $state = array(); // inner state of the model
+	protected $primary_key = ''; // primary key in the table
 	
 	public $table = ''; // table connected to this model
+	
 	
 	/*
 	 * Constructor takes all the important objects for the model
@@ -39,7 +41,7 @@ abstract class BaseModel{
 	 */
 	public function GetItem( $id ){
 		$obj = new \DB\SQL\Mapper( $this->db, $this->table );
-		return $obj->load( $id );
+		return $obj->load( array( $this->primary_key.' = ?',  $id ) );
 	}
 
 	/*

@@ -29,7 +29,7 @@ Game.BindEvents = function() {
 		
 		$.ajax( {
 			'type' : 'POST',
-			'url' : '/git_csc337/game/makeMove',
+			'url' : (base_url+'/game/makeMove'),
 			'data' : post_data,
 			'success' : Game.FieldClick,
 			'dataType' : 'JSON'

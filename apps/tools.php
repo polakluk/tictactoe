@@ -17,6 +17,15 @@ abstract class Tools{
 		MOVE_STATE_DONE = 1, // the move already exist and it's decided
 		MOVE_STATE_TMP = 2, // the move exists but it's not final yet
 		
+		// teams (written)
+		TEAM_RED = 'red',
+		TEAM_BLUE = 'blue',
+		TEAN_SPEC = 'spectator',
+		
+		// teams (DB)
+		TEAM_BLUE_SQL = 0,
+		TEAM_RED_SQL = 1,
+		
 		last = ''; // so I dont have to bother with commas
 
 		/*

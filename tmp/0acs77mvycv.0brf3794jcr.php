@@ -38,13 +38,16 @@
 		<?php endforeach; ?>
 		
 			<tr>
-				<td colspan="3">
-			  		<a href="<?php echo $BASE; ?>/game/join/<?php echo $game_id; ?>" class="btn btn-success pull-right">
+				<td colspan="100">
 						<?php if ($join_game): ?>
-							Join game
-							<?php else: ?>Spectate game
+							
+								<a href="<?php echo $BASE; ?>/game/join/<?php echo $game_id; ?>/blue" class="btn btn-primary">Join Blue team</a>
+								<a href="<?php echo $BASE; ?>/game/join/<?php echo $game_id; ?>/red" class="btn btn-danger">Join Red team</a>
+							
+							<?php else: ?>
+						  		<a href="<?php echo $BASE; ?>/game/show/<?php echo $game_id; ?>" class="btn btn-success">Spectate game</a>
+							
 						<?php endif; ?>
-			  		</a>				
 				</td>
 			</tr>
 	</table>
