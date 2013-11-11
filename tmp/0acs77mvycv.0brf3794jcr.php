@@ -24,7 +24,7 @@
 							<td>
 								<img src="<?php echo $BASE; ?>/media/images/blue.png" alt="blue" />
 							</td>
-						<?php if (TRUE) break; ?><?php case '0': ?>
+						<?php if (TRUE) break; ?><?php case '2': ?>
 							<td>
 								<img src="<?php echo $BASE; ?>/media/images/red.png" alt="red" />
 							</td>

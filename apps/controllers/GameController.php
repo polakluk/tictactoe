@@ -145,6 +145,7 @@ class GameController extends BaseController {
 							$result->html = \Template::instance()->render( 'views/game/msg.htm' );
 							$this->f3->clear( 'msg_text' );
 							$this->f3->clear( 'msg_type' );
+							$this->finishGame( $this->player->game );
 							return json_encode($result);
 						}
 						
@@ -352,5 +353,22 @@ class GameController extends BaseController {
 		}
 		
 		return $result;
+	}
+
+	/*
+	 * Finishes the game and creates a new now
+	 */
+	private function finishGame( $id ) {
+		$model = new \Models\DeskModel( $this->f3, $this->db );
+		$game = $model->GetItem( $id, true );
+		$game->game_ended = 1;
+		$game->save();
+		
+		$game->reset();
+		$game->game_turn = 1;
+		$game->game_team = 1;
+		$game->game_size = 5;
+		$game->game_ended = 0;
+		$game->save();
 	}
 }
