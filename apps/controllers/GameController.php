@@ -54,12 +54,24 @@ class GameController extends BaseController {
 	private function makeMove( $param_list ) {
 		$row = $this->f3->get( "POST.row" );
 		$col = $this->f3->get( "POST.col" );
-		
+
 		$model = new \Models\MoveModel( $this->f3, $this->db );
 		$exists = $model->CheckExistence( $this->player->game, $row, $col );
 		$this->output_format = \Tools::OUTPUT_FORMAT_RAW;
 
 		$model_desk = new \Models\DeskModel( $this->f3, $this->db );
+		$game = $model_desk->GetItem( $this->player->game, true );
+		if( $game->game_team != $this->player->team ) { // not your turn dude
+			$result = new \stdClass();
+			$result->state = 0;
+			$this->f3->set( 'msg_text', 'It\'s not your turn dude! :)' );
+			$this->f3->set( 'msg_type', 'danger' );
+			$result->html = \Template::instance()->render( 'views/game/msg.htm' );
+			$this->f3->clear( 'msg_text' );
+			$this->f3->clear( 'msg_type' );
+			return json_encode($result);
+		}
+		
 		$players = $model_desk->GetNumberPlayers( $this->player->game, $this->player->team );
 		
 		$msg = array();
@@ -69,21 +81,26 @@ class GameController extends BaseController {
 				{
 					if( $players > 1 ) {
 						$msg[0] = 'Your move has been announced to your teammates. Wait for their evaluation!';
-						$msg[1] = 'primary';						
+						$msg[1] = 'warning';						
 					} else {
 						$msg[0] = 'Your move has been successfully recorded!';
 						$msg[1] = 'success';
 						
 						// save the move
 						$table = new \DB\SQL\Mapper( $this->db, 'moves' );
-						$table->game_id = $game_id;
+						$table->game_id = $this->player->game;
 						$table->row = $row;
 						$table->col = $col;
-						$table->player_id = 1;
-						$table->team = 1;
+						$table->player_id = $this->player->id;
+						$table->team = $this->player->team;
 						$table->created = date( 'Y-m-d H:i:s', time() );
 						$table->state = \Tools::MOVE_STATE_DONE;
 						$table->save();
+						
+						// update game stats
+						$game->game_turn++;
+						$game->game_team = 1 + (2 - $game->game_team);
+						$game->save();
 					}
 					break;
 				}
@@ -104,6 +121,8 @@ class GameController extends BaseController {
 		
 		$result = new \stdClass();
 		$result->state = $exists;
+		$result->turn = $game->game_turn;
+		$result->team = $game->game_team;
 		$this->f3->set( 'msg_text', $msg[0] );
 		$this->f3->set( 'msg_type', $msg[1] );
 		$result->html = \Template::instance()->render( 'views/game/msg.htm' );

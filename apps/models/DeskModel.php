@@ -22,16 +22,21 @@ class DeskModel extends BaseModel{
 	/*
 	 * Gets a simple item from this model based on its ID
 	 */
-	public function GetItem( $id ) {
+	public function GetItem( $id, $raw = false ) {
 		$desk = parent::GetItem( $id );
 		if( $desk === false ) { // no game was found
 			return false;
 		}
-		$game = new \stdClass();
-		$game->info = clone $desk;
-		$game->desk = $this->GetDesk( $desk );
 		
-		return $game;
+		if( $raw ) {
+			return $desk;
+		} else {
+			$game = new \stdClass();
+			$game->info = clone $desk;
+			$game->desk = $this->GetDesk( $desk );
+			
+			return $game;
+		}
 	}
 	
 	/*

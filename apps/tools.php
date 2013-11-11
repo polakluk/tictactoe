@@ -26,6 +26,9 @@ abstract class Tools{
 		TEAM_BLUE_SQL = 1,
 		TEAM_RED_SQL = 2,
 		
+		// general constants
+		CONNECT_FIELDS = 4,
+		
 		last = ''; // so I dont have to bother with commas
 
 		/*
