@@ -52,6 +52,7 @@ class GameController extends BaseController {
 	 * This method tries to save the move. If it's not possible, it notifies use about the issue
 	 */
 	private function makeMove( $param_list ) {
+		$state = 0;
 		$row = $this->f3->get( "POST.row" );
 		$col = $this->f3->get( "POST.col" );
 
@@ -81,7 +82,8 @@ class GameController extends BaseController {
 				{
 					if( $players > 1 ) {
 						$msg[0] = 'Your move has been announced to your teammates. Wait for their evaluation!';
-						$msg[1] = 'warning';						
+						$msg[1] = 'warning';
+						$state = 3;			
 					} else {
 						$msg[0] = 'Your move has been successfully recorded!';
 						$msg[1] = 'success';
@@ -97,10 +99,12 @@ class GameController extends BaseController {
 						$table->state = \Tools::MOVE_STATE_DONE;
 						$table->save();
 						
+						
 						// update game stats
 						$game->game_turn++;
 						$game->game_team = 1 + (2 - $game->game_team);
 						$game->save();
+						$state = 1;
 					}
 					break;
 				}
@@ -108,6 +112,7 @@ class GameController extends BaseController {
 				{
 					$msg[0] = 'Somebdy from your team has alraedy selected this field!';
 					$msg[1] = 'warning';
+					$state = 0;
 					break;
 				}
 			case \Tools::MOVE_STATE_DONE:
@@ -115,14 +120,18 @@ class GameController extends BaseController {
 				{
 					$msg[0] = 'This field is already occupied!';
 					$msg[1] = 'danger';
+					$state = 0;
 					break;
 				}
 		}
 		
 		$result = new \stdClass();
-		$result->state = $exists;
+		$result->state = $state;
 		$result->turn = $game->game_turn;
 		$result->team = $game->game_team;
+		$result->row = $row;
+		$result->col = $col;
+		$result->game = $this->player->game;
 		$this->f3->set( 'msg_text', $msg[0] );
 		$this->f3->set( 'msg_type', $msg[1] );
 		$result->html = \Template::instance()->render( 'views/game/msg.htm' );
