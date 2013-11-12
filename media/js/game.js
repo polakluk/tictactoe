@@ -6,10 +6,14 @@ function Game() {
 Game.Init = function() {
 	Game.elements = {};
 	Game.elements.main_container = $( 'div.container-game' );
+	Game.elements.showroom = $( 'div.container-showroom' );
 	Game.elements.panel_msg = $( '#panel-msg', Game.elements.main_container );
 	Game.elements.desk = $( 'table.table-desk', Game.elements.main_container );
 	Game.elements.td_team = $( 'tr#trTeam td:eq(1)' );
 	Game.elements.td_turn = $( 'tr#trTurn td:eq(1)' );
+	
+	Game.elements.td_team_red = $('tr[data-team="2"] td:eq(1)');
+	Game.elements.td_team_blue = $('tr[data-team="1"] td:eq(1)');
 	
 	Game.id = Game.elements.desk.attr( 'data-game' );
 	Game.on = Game.elements.desk.attr( 'data-enabled' ) == '1';
@@ -130,6 +134,9 @@ Game.FieldTd = function( row, col, game ) {
 Game.MapPusher = function() {
 	Game.channels = {};
 	Game.channels.main = Game.Pusher.subscribe( 'game-' + Game.id );
+	if( Game.IsShowroom() ) {
+		
+	} 
 	
 	// change game stats
 	Game.channels.main.bind( 'update_stats', function( data ) {
@@ -145,11 +152,36 @@ Game.MapPusher = function() {
 	Game.channels.main.bind( 'game_over', function( data ) {
 		Game.MarkField( data.row, data.col, data.game, data.team );		
 		Game.MarkWinner(data.start_row, data.start_col, data.dir, data.game, data.fields );
-		Game.elements.panel_msg.prepend( data.html );
-		
+		if( !Game.IsShowroom() ) {
+			Game.elements.panel_msg.prepend( data.html );			
+		}
+	
 		// unsubscribe from any further msgs
 		Game.Pusher.unsubscribe( 'game-'+data.game );
 	});
+	
+	// update number of people
+	Game.channels.main.bind( 'update_players', function( data ) {
+		Game.UpdatePlayers( data.red, data.blue );		
+	});
+
+/*	
+	if( Game.IsShowroom() ) {
+		Game.channels.aux.bind( 'new_game', function( data ) {
+			
+		});
+	}
+*/
+}
+
+// update number of playes
+Game.UpdatePlayers = function( red, blue) {
+	Game.elements.td_team_red.html( red );
+	Game.elements.td_team_blue.html( blue );
+}
+
+Game.IsShowroom = function() {
+	return Game.elements.showroom.size() == 1;
 }
 
 $(function(){

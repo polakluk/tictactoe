@@ -25,50 +25,6 @@
 	</div>
 </div>
 
-<check if="{{ @spectator == TRUE }}">
-	<true> </true>
-	<false>
-		<div class="panel panel-danger poll">
-			<div class="panel-heading">
-		    	<h3 class="panel-title">Poll</h3>
-		  	</div>
-		  	<div class="panel-body">
-		  		<include href="views/game/poll/idle.htm" />
-			</div>
-		</div>
-		
-<exclude>
-		<div class="panel panel-danger poll">
-			<div class="panel-heading">
-		    	<h3 class="panel-title">Poll</h3>
-		  	</div>
-		  	<div class="panel-body">
-		  		<include href="views/game/poll/available.htm" />
-			</div>
-		</div>
-		
-		<div class="panel panel-danger poll">
-			<div class="panel-heading">
-		    	<h3 class="panel-title">Poll</h3>
-		  	</div>
-		  	<div class="panel-body">
-		  		<include href="views/game/poll/questions.htm" />
-			</div>
-		</div>
-		
-		<div class="panel panel-danger poll">
-			<div class="panel-heading">
-		    	<h3 class="panel-title">Poll</h3>
-		  	</div>
-		  	<div class="panel-body">
-		  		<include href="views/game/poll/results.htm" />
-			</div>
-		</div		
-	</false>
-</exclude>
-</check>
-
-
 <div class="panel panel-success">
 	<div class="panel-heading">
     	<h3 class="panel-title">Teams</h3>
