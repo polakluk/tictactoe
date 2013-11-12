@@ -23,7 +23,7 @@ Game.Init = function() {
 
 // this method determines, whether the game object should be used for this page
 Game.Ready = function() {
-	return Game.elements.game_container.size() == 1;
+	return Game.elements.game_container.size() == 1 || Game.elements.showroom.size() == 1;
 }
 
 //this method binds all events on elements
@@ -89,7 +89,7 @@ Game.UpdateStats = function( turn, team, game ) {
 	}
 	
 	if( Game.IsShowroom() ) {
-		var act = $('div.panel[data-desk="'+game+'"] h3').html( 'Turn: '+turn );
+		var act = $('div.panel[data-desk="'+game+'"] div.panel-body h3').html( 'Turn: '+turn );
 		act.append( obj );
 	} else {
 		Game.elements.td_team.html( obj );
