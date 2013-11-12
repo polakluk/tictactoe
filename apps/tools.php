@@ -28,6 +28,7 @@ abstract class Tools{
 		
 		// general constants
 		CONNECT_FIELDS = 4,
+		DESK_SIZE = 5,
 		
 		last = ''; // so I dont have to bother with commas
 

@@ -395,12 +395,14 @@ class GameController extends BaseController {
 		$game->reset();
 		$game->game_turn = 1;
 		$game->game_team = 1;
-		$game->game_size = 5;
+		$game->game_size = \Tools::DESK_SIZE;
 		$game->game_ended = 0;
+		$game->game_created = date( 'Y-m-d H:i:s', time() );
 		$game->save();
 		
 		// announce a new game
-		$data = array( 'game' => $game->game_id, );
+		$pusher = new \Pusher( $this->f3->get( 'Pusher.key' ), $this->f3->get( 'Pusher.secret' ), $this->f3->get( 'Pusher.app' ));
+		$data = array( 'act' => $game->game_id, 'old' => $id, 'turn' => $game->game_turn, 'team' => $game->game_team );
 		$pusher->trigger( 'general', 'new_game', $data );
 	}
 }

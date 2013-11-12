@@ -143,23 +143,55 @@ Game.MapPusher = function() {
 		Game.channels.main[idx] = Game.Pusher.subscribe( 'game-' + obj.attr( 'data-game' ) );
 	});
 	
-	if( Game.IsShowroom() ) {
-		
-	} 
-	
 	for( i = 0; i < Game.channels.main.length; i++ ) {
+		Game.BindPusher( Game.channels.main[i] );
+	}
+
+	if( Game.IsShowroom() ) {
+		Game.channels.aux = Game.Pusher.subscribe( 'general' );
+		Game.channels.aux.bind( 'new_game', function( data ) {
+			a_idx = 0;
+			a_desk = null;
+			// find which desk should be replaced
+			Game.elements.desk.each( function( idx, e ) {
+				var obj = $(e);
+				if( obj.attr('data-game') == data.old ) {
+					a_idx = idx;
+					a_desk = obj;
+				};
+			});
+			
+			// unsubscribe and hide the old desk
+			a_desk.fadeOut( 'slow', function() {
+
+				$( 'tr.game td', a_desk).each( function(i, e) {
+					$(this).html( '&nbsp;' );
+				});
+				Game.channels.main[a_idx] = Game.Pusher.subscribe( 'game-' + data.act );
+				Game.BindPusher( Game.channels.main[a_idx] );
+				a_desk.attr( 'data-game', data.act );
+				a_desk.parent().attr( 'data-desk', data.act );
+				Game.UpdateStats( data.turn, data.team, data.act );
+				$( 'div.panel-heading h3', a_desk.parent() ).html( "Game #"+data.act );
+				a_desk.fadeIn('fade');
+			});
+		});
+	}
+}
+
+Game.BindPusher = function( channel ) {
 		// change game stats
-		Game.channels.main[i].bind( 'update_stats', function( data ) {
+		channel.bind( 'update_stats', function( data ) {
 			Game.UpdateStats( data.turn, data.team, data.game );
 		});
 		
 		// mark move
-		Game.channels.main[i].bind( 'move', function( data ) {
+		channel.bind( 'move', function( data ) {
 			Game.MarkField( data.row, data.col, data.game, data.team );		
 		});
 		
 		// response to Game over 
-		Game.channels.main[i].bind( 'game_over', function( data ) {
+		channel.bind( 'game_over', function( data ) {
 			Game.MarkField( data.row, data.col, data.game, data.team );		
 			Game.MarkWinner(data.start_row, data.start_col, data.dir, data.game, data.fields );
 			if( !Game.IsShowroom() ) {
@@ -171,18 +203,9 @@ Game.MapPusher = function() {
 		});
 		
 		// update number of people
-		Game.channels.main[i].bind( 'update_players', function( data ) {
+		channel.bind( 'update_players', function( data ) {
 			Game.UpdatePlayers( data.red, data.blue, data.game );		
-		});
-	}
-
-/*	
-	if( Game.IsShowroom() ) {
-		Game.channels.aux.bind( 'new_game', function( data ) {
-			
-		});
-	}
-*/
+		});	
 }
 
 // update number of playes
