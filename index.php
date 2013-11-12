@@ -7,6 +7,11 @@ if ((float)PCRE_VERSION<7.9)
 
 $f3->config('config.ini');
 
+$f3->set('AUTOLOAD', 
+        __dir__.'/apps/;'
+        );
+
+
 $f3->route('GET|POST /', 'Dispatcher->DisplayHome');
 $f3->route('GET|POST /@view', 'Dispatcher->DisplayView');
 $f3->route('GET|POST /@view/@task', 'Dispatcher->DisplayView');

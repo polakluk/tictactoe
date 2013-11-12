@@ -12,8 +12,8 @@ class Dispatcher {
 	 */
 	function __construct() {
 
- 		$this->f3 = Base::instance();
-        $this->db = new DB\SQL( $this->f3->get('db_dns') . $this->f3->get('db_name'), $this->f3->get('db_user'), $this->f3->get('db_pass') );
+ 		$this->f3 = \Base::instance();
+        $this->db = new \DB\SQL( $this->f3->get('db_dns') . $this->f3->get('db_name'), $this->f3->get('db_user'), $this->f3->get('db_pass') );
 		
 		if( !$this->f3->exists( 'SESSION.msgs' ) ) {
 			$this->f3->set( 'SESSION.msgs', array() );
@@ -58,7 +58,7 @@ class Dispatcher {
 			
 			switch( $c->output_format ) {
 				default:
-				case Tools::OUTPUT_FORMAT_NORMAL:
+				case \Tools::OUTPUT_FORMAT_NORMAL:
 					{
 						$this->f3->set( 'page_body', $render );
 						$this->f3->set( 'whole_page', true );
@@ -66,12 +66,12 @@ class Dispatcher {
 						$this->f3->set( 'SESSION.msgs', array() );
 						break;
 					}
-				case Tools::OUTPUT_FORMAT_RAW :
+				case \Tools::OUTPUT_FORMAT_RAW :
 					{
 						echo $render;
 						break;
 					}
-				case Tools::OUTPUT_FORMAT_VIEW:
+				case \Tools::OUTPUT_FORMAT_VIEW:
 					{
 						$this->f3->set( 'page_body', $render );
 						$this->f3->set( 'whole_page', false );
