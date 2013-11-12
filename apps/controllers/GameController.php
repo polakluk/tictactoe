@@ -97,9 +97,6 @@ class GameController extends BaseController {
 			$this->f3->clear( 'msg_type' );
 			return json_encode($result);
 		}
-
-		
-		$players = $model_desk->GetNumberPlayers( $this->player->game, $this->player->team );
 		
 		$msg = array();
 		$pusher = new \Pusher( $this->f3->get( 'Pusher.key' ), $this->f3->get( 'Pusher.secret' ), $this->f3->get( 'Pusher.app' ));
@@ -107,82 +104,69 @@ class GameController extends BaseController {
 		{
 			case \Tools::MOVE_STATE_NONE:
 				{
-					if( $players > 1 ) {
-						$msg[0] = 'Your move has been announced to your teammates. Wait for their evaluation!';
-						$msg[1] = 'warning';
-						$state = 3;			
-					} else {
-						$msg[0] = 'Your move has been successfully recorded!';
-						$msg[1] = 'success';
-						
-						// save the move
-						$table = new \DB\SQL\Mapper( $this->db, 'moves' );
-						$table->game_id = $this->player->game;
-						$table->row = $row;
-						$table->col = $col;
-						$table->player_id = $this->player->id;
-						$table->team = $this->player->team;
-						$table->created = date( 'Y-m-d H:i:s', time() );
-						$table->state = \Tools::MOVE_STATE_DONE;
-						$table->turn = $game->game_turn;
-						$table->save();
-						$data = array( 'col' => $col, 'row' => $row, 'team' => $this->player->team, 'game' => $this->player->game );
-						$pusher->trigger( 'game-'.$game->game_id, 'move', $data );
+					$msg[0] = 'Your move has been successfully recorded!';
+					$msg[1] = 'success';
+					
+					// save the move
+					$table = new \DB\SQL\Mapper( $this->db, 'moves' );
+					$table->game_id = $this->player->game;
+					$table->row = $row;
+					$table->col = $col;
+					$table->player_id = $this->player->id;
+					$table->team = $this->player->team;
+					$table->created = date( 'Y-m-d H:i:s', time() );
+					$table->state = \Tools::MOVE_STATE_DONE;
+					$table->turn = $game->game_turn;
+					$table->save();
+					$data = array( 'col' => $col, 'row' => $row, 'team' => $this->player->team, 'game' => $this->player->game );
+					$pusher->trigger( 'game-'.$game->game_id, 'move', $data );
 
-						// update game stats
-						$game->game_turn++;
-						$game->game_team = 1 + (2 - $game->game_team);
-						$game->save();
-						$data = array( 'turn' => $game->game_turn, 'team' => $game->game_team );
-						$pusher->trigger( 'game-'.$game->game_id, 'update_stats', $data );
-						
-						// check, if the game is not over
-						$res = $this->checkGame( $this->player->game, $row, $col );
-						
-						if( $res->done ) { // we won :)
-							$result = new \stdClass();
-							$result->state = 2;
-							$result->fields = \Tools::CONNECT_FIELDS;
-							$result->start_row = $res->row;
-							$result->start_col = $res->col;
-							$result->dir = $res->dir;
-							$result->row = $row;
-							$result->col = $col;
-							$result->turn = $game->game_turn;
-							$result->team = $this->player->team;
-							$result->game = $this->player->game;
+					// update game stats
+					$game->game_turn++;
+					$game->game_team = 1 + (2 - $game->game_team);
+					$game->save();
+					$data = array( 'turn' => $game->game_turn, 'team' => $game->game_team, 'game' => $game->game_id );
+					$pusher->trigger( 'game-'.$game->game_id, 'update_stats', $data );
+					
+					// check, if the game is not over
+					$res = $this->checkGame( $this->player->game, $row, $col );
+					
+					if( $res->done ) { // we won :)
+						$result = new \stdClass();
+						$result->state = 2;
+						$result->fields = \Tools::CONNECT_FIELDS;
+						$result->start_row = $res->row;
+						$result->start_col = $res->col;
+						$result->dir = $res->dir;
+						$result->row = $row;
+						$result->col = $col;
+						$result->turn = $game->game_turn;
+						$result->team = $this->player->team;
+						$result->game = $this->player->game;
 
-							$this->f3->set( 'msg_text', 'Game is over! The winner is team '.$res->winner.'. Feel free to play another game.' );
-							$this->f3->set( 'msg_type', 'success' );
-							$result->html = \Template::instance()->render( 'views/game/msg.htm' );
-							$this->f3->clear( 'msg_text' );
-							$this->f3->clear( 'msg_type' );
-							$this->finishGame( $this->player->game );
-							$data = array(
-								'start_row' => $res->row,
-								'start_col' => $res->col,
-								'row' => $row,
-								'col' => $col,
-								'dir' => $res->dir,
-								'game' => $this->player->game,
-								'team' => $this->player->team,
-								'fields' => \Tools::CONNECT_FIELDS,
-								'html' => $result->html,
-								'socket' => $socket
-							);
-							$pusher->trigger( 'game-'.$game->game_id, 'game_over', $data, $socket );
-							return json_encode($result);
-						}
-						
-						$state = 1;
+						$this->f3->set( 'msg_text', 'Game is over! The winner is team '.$res->winner.'. Feel free to play another game.' );
+						$this->f3->set( 'msg_type', 'success' );
+						$result->html = \Template::instance()->render( 'views/game/msg.htm' );
+						$this->f3->clear( 'msg_text' );
+						$this->f3->clear( 'msg_type' );
+						$this->finishGame( $this->player->game );
+						$data = array(
+							'start_row' => $res->row,
+							'start_col' => $res->col,
+							'row' => $row,
+							'col' => $col,
+							'dir' => $res->dir,
+							'game' => $this->player->game,
+							'team' => $this->player->team,
+							'fields' => \Tools::CONNECT_FIELDS,
+							'html' => $result->html,
+							'socket' => $socket
+						);
+						$pusher->trigger( 'game-'.$game->game_id, 'game_over', $data, $socket );
+						return json_encode($result);
 					}
-					break;
-				}
-			case \Tools::MOVE_STATE_TMP:
-				{
-					$msg[0] = 'Somebdy from your team has alraedy selected this field!';
-					$msg[1] = 'warning';
-					$state = 0;
+					
+					$state = 1;
 					break;
 				}
 			case \Tools::MOVE_STATE_DONE:
@@ -230,6 +214,18 @@ class GameController extends BaseController {
 		$table_xref->load( array( 'game_id = ? AND player_id = ?', $id, $this->player->id ) );
 		$table_xref->erase();
 
+		// send update message for other players
+		$pusher = new \Pusher( $this->f3->get( 'Pusher.key' ), $this->f3->get( 'Pusher.secret' ), $this->f3->get( 'Pusher.app' ));
+
+		$model = new \Models\DeskModel( $this->f3, $this->db );
+		$members = $model->GetNumberPlayers( $id );
+		$data = array(
+				'game' => $id,
+				'red' => $members[\Tools::TEAM_RED_SQL],
+				'blue' => $members[\Tools::TEAM_BLUE_SQL]
+					);
+		$pusher->trigger( 'game-'.$id, 'update_players', $data );
+		
 		\Tools::EnqueueMessage( 'You left the game' );
 		$this->f3->reroute( '/showroom' );
 		return false;
@@ -258,6 +254,17 @@ class GameController extends BaseController {
 		$table_xref->player_id = $this->player->id;
 		$table_xref->player_team = $this->player->team == \Tools::TEAM_RED_SQL ? \Tools::TEAM_RED_SQL : \Tools::TEAM_BLUE_SQL;
 		$table_xref->save();
+
+		// send update message for other players
+		$pusher = new \Pusher( $this->f3->get( 'Pusher.key' ), $this->f3->get( 'Pusher.secret' ), $this->f3->get( 'Pusher.app' ));
+		$model = new \Models\DeskModel( $this->f3, $this->db );
+		$members = $model->GetNumberPlayers( $id );
+		$data = array(
+				'game' => $id,
+				'red' => $members[\Tools::TEAM_RED_SQL],
+				'blue' => $members[\Tools::TEAM_BLUE_SQL]
+					);
+		$pusher->trigger( 'game-'.$id, 'update_players', $data );
 		
 		\Tools::EnqueueMessage( 'You joined the game.' );
 		$this->f3->reroute( '/game/show/'.$id );
@@ -391,5 +398,9 @@ class GameController extends BaseController {
 		$game->game_size = 5;
 		$game->game_ended = 0;
 		$game->save();
+		
+		// announce a new game
+		$data = array( 'game' => $game->game_id, );
+		$pusher->trigger( 'general', 'new_game', $data );
 	}
 }

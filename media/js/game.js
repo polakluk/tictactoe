@@ -5,17 +5,14 @@ function Game() {
 // this method initializes and caches all important variables for the game object
 Game.Init = function() {
 	Game.elements = {};
-	Game.elements.main_container = $( 'div.container-game' );
+	Game.elements.game_container = $( 'div.container-game' );
 	Game.elements.showroom = $( 'div.container-showroom' );
-	Game.elements.panel_msg = $( '#panel-msg', Game.elements.main_container );
-	Game.elements.desk = $( 'table.table-desk', Game.elements.main_container );
+	Game.elements.panel_msg = $( '#panel-msg', Game.elements.game_container );
+	Game.elements.desk = $( 'table.table-desk');
 	Game.elements.td_team = $( 'tr#trTeam td:eq(1)' );
 	Game.elements.td_turn = $( 'tr#trTurn td:eq(1)' );
 	
-	Game.elements.td_team_red = $('tr[data-team="2"] td:eq(1)');
-	Game.elements.td_team_blue = $('tr[data-team="1"] td:eq(1)');
 	
-	Game.id = Game.elements.desk.attr( 'data-game' );
 	Game.on = Game.elements.desk.attr( 'data-enabled' ) == '1';
 	// init Pusher
 	Game.Pusher = new Pusher( pusher_key );
@@ -26,7 +23,7 @@ Game.Init = function() {
 
 // this method determines, whether the game object should be used for this page
 Game.Ready = function() {
-	return Game.elements.main_container.size() == 1;
+	return Game.elements.game_container.size() == 1;
 }
 
 //this method binds all events on elements
@@ -83,16 +80,22 @@ Game.FieldClick = function( data ) {
 }	
 
 // update game statistics
-Game.UpdateStats = function( turn, team ) {
+Game.UpdateStats = function( turn, team, game ) {
 	var obj = null;
-	if( turn == 2 ) {
+	if( team == 2 ) {
 		obj = $( '<span />', { 'class' : 'label label-danger', 'text' : 'Red' } );
 	} else {
 		obj = $( '<span />', { 'class' : 'label label-primary', 'text' : 'Blue' } );
 	}
-	Game.elements.td_team.html( obj );
-	Game.elements.td_turn.html( turn );
-	Game.elements.td_turn.attr( 'data-turn', turn );
+	
+	if( Game.IsShowroom() ) {
+		var act = $('div.panel[data-desk="'+game+'"] h3').html( 'Turn: '+turn );
+		act.append( obj );
+	} else {
+		Game.elements.td_team.html( obj );
+		Game.elements.td_turn.html( turn );
+		Game.elements.td_turn.attr( 'data-turn', turn );		
+	}
 }
 
 // mark winning fields
@@ -133,37 +136,45 @@ Game.FieldTd = function( row, col, game ) {
 // maps events from Pusher
 Game.MapPusher = function() {
 	Game.channels = {};
-	Game.channels.main = Game.Pusher.subscribe( 'game-' + Game.id );
+	Game.channels.main = [];
+	
+	Game.elements.desk.each( function( idx, e ) {
+		var obj = $(e);
+		Game.channels.main[idx] = Game.Pusher.subscribe( 'game-' + obj.attr( 'data-game' ) );
+	});
+	
 	if( Game.IsShowroom() ) {
 		
 	} 
 	
-	// change game stats
-	Game.channels.main.bind( 'update_stats', function( data ) {
-		Game.UpdateStats( data.turn, data.team );
-	});
-	
-	// mark move
-	Game.channels.main.bind( 'move', function( data ) {
-		Game.MarkField( data.row, data.col, data.game, data.team );		
-	});
-	
-	// response to Game over 
-	Game.channels.main.bind( 'game_over', function( data ) {
-		Game.MarkField( data.row, data.col, data.game, data.team );		
-		Game.MarkWinner(data.start_row, data.start_col, data.dir, data.game, data.fields );
-		if( !Game.IsShowroom() ) {
-			Game.elements.panel_msg.prepend( data.html );			
-		}
-	
-		// unsubscribe from any further msgs
-		Game.Pusher.unsubscribe( 'game-'+data.game );
-	});
-	
-	// update number of people
-	Game.channels.main.bind( 'update_players', function( data ) {
-		Game.UpdatePlayers( data.red, data.blue );		
-	});
+	for( i = 0; i < Game.channels.main.length; i++ ) {
+		// change game stats
+		Game.channels.main[i].bind( 'update_stats', function( data ) {
+			Game.UpdateStats( data.turn, data.team, data.game );
+		});
+		
+		// mark move
+		Game.channels.main[i].bind( 'move', function( data ) {
+			Game.MarkField( data.row, data.col, data.game, data.team );		
+		});
+		
+		// response to Game over 
+		Game.channels.main[i].bind( 'game_over', function( data ) {
+			Game.MarkField( data.row, data.col, data.game, data.team );		
+			Game.MarkWinner(data.start_row, data.start_col, data.dir, data.game, data.fields );
+			if( !Game.IsShowroom() ) {
+				Game.elements.panel_msg.prepend( data.html );			
+			}
+		
+			// unsubscribe from any further msgs
+			Game.Pusher.unsubscribe( 'game-'+data.game );
+		});
+		
+		// update number of people
+		Game.channels.main[i].bind( 'update_players', function( data ) {
+			Game.UpdatePlayers( data.red, data.blue, data.game );		
+		});
+	}
 
 /*	
 	if( Game.IsShowroom() ) {
@@ -175,9 +186,11 @@ Game.MapPusher = function() {
 }
 
 // update number of playes
-Game.UpdatePlayers = function( red, blue) {
-	Game.elements.td_team_red.html( red );
-	Game.elements.td_team_blue.html( blue );
+Game.UpdatePlayers = function( red, blue, game) {
+	if( !Game.IsShowroom() ) {
+		$('div[data-desk="'+game+'"] tr[data-team="2"] td:eq(1)').html( red );
+		$('div[data-desk="'+game+'"] tr[data-team="1"] td:eq(1)').html( blue );		
+	}
 }
 
 Game.IsShowroom = function() {

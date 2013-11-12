@@ -125,7 +125,7 @@ class GameController extends BaseController {
 					$game->game_turn++;
 					$game->game_team = 1 + (2 - $game->game_team);
 					$game->save();
-					$data = array( 'turn' => $game->game_turn, 'team' => $game->game_team );
+					$data = array( 'turn' => $game->game_turn, 'team' => $game->game_team, 'game' => $game->game_id );
 					$pusher->trigger( 'game-'.$game->game_id, 'update_stats', $data );
 					
 					// check, if the game is not over
@@ -220,6 +220,7 @@ class GameController extends BaseController {
 		$model = new \Models\DeskModel( $this->f3, $this->db );
 		$members = $model->GetNumberPlayers( $id );
 		$data = array(
+				'game' => $id,
 				'red' => $members[\Tools::TEAM_RED_SQL],
 				'blue' => $members[\Tools::TEAM_BLUE_SQL]
 					);
@@ -259,6 +260,7 @@ class GameController extends BaseController {
 		$model = new \Models\DeskModel( $this->f3, $this->db );
 		$members = $model->GetNumberPlayers( $id );
 		$data = array(
+				'game' => $id,
 				'red' => $members[\Tools::TEAM_RED_SQL],
 				'blue' => $members[\Tools::TEAM_BLUE_SQL]
 					);
