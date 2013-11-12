@@ -174,6 +174,9 @@ Game.MapPusher = function() {
 				Game.UpdateStats( data.turn, data.team, data.act );
 				$( 'div.panel-heading h3', a_desk.parent() ).html( "Game #"+data.act );
 				a_desk.fadeIn('fade');
+				
+				$('a.btn-primary', a_desk ).attr( 'href', base_url+"/game/join/"+data.act+"/blue" );
+				$('a.btn-danger', a_desk ).attr( 'href', base_url+"/game/join/"+data.act+"/red" );
 			});
 		});
 	}
