@@ -12,12 +12,11 @@ class ShowroomController extends BaseController {
 	public function Execute() {
 		$this->f3->set( 'username', 'elf' );
 		$params = $this->f3->get('PARAMS');
-		$task = isset( $params['task'] ) ? $params['task'] : '';
 		
 		$model_player = new \Models\PlayerModel( $this->f3, $this->db );
 		$player = $model_player->GetCurrentPlayer();
 		
-		$spectator = !empty( $task ) || $player->name == '';
+		$spectator = $player->name == '';
 		
 		$this->f3->set( 'join_game', !$spectator );
 		$this->f3->set('game_username', $spectator ? '<<spectator>>' : $player->name );
