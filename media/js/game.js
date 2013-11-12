@@ -12,6 +12,7 @@ Game.Init = function() {
 	Game.elements.td_turn = $( 'tr#trTurn td:eq(1)' );
 	
 	Game.id = Game.elements.desk.attr( 'data-game' );
+	Game.on = Game.elements.desk.attr( 'data-enabled' ) == '1';
 	// init Pusher
 	Game.Pusher = new Pusher( pusher_key );
 	Game.Pusher.connection.bind( 'connected', function() {
@@ -26,24 +27,26 @@ Game.Ready = function() {
 
 //this method binds all events on elements
 Game.BindEvents = function() {
-	Game.elements.desk.on( 'click', 'td.empty', function( e ) {
-		var obj = $( this );
-		var post_data = {
-			'row' : obj.attr( 'data-row' ),
-			'col' : obj.attr( 'data-col' ),
-			'socket' : Game.socket,
-			'turn' : Game.elements.td_turn.attr( 'data-turn' )
-					};
-		
-		$.ajax( {
-			'type' : 'POST',
-			'url' : (base_url+'/game/makeMove'),
-			'data' : post_data,
-			'success' : Game.FieldClick,
-			'dataType' : 'JSON'
-			})
-			.fail( function() { alert( 'Something went terribly wrong :( ' ); });
-	});	
+	if( Game.on ) {
+		Game.elements.desk.on( 'click', 'td.empty', function( e ) {
+			var obj = $( this );
+			var post_data = {
+				'row' : obj.attr( 'data-row' ),
+				'col' : obj.attr( 'data-col' ),
+				'socket' : Game.socket,
+				'turn' : Game.elements.td_turn.attr( 'data-turn' )
+						};
+			
+			$.ajax( {
+				'type' : 'POST',
+				'url' : (base_url+'/game/makeMove'),
+				'data' : post_data,
+				'success' : Game.FieldClick,
+				'dataType' : 'JSON'
+				})
+				.fail( function() { alert( 'Something went terribly wrong :( ' ); });
+		});			
+	}
 	Game.MapPusher();
 }
 
@@ -136,6 +139,16 @@ Game.MapPusher = function() {
 	// mark move
 	Game.channels.main.bind( 'move', function( data ) {
 		Game.MarkField( data.row, data.col, data.game, data.team );		
+	});
+	
+	// response to Game over 
+	Game.channels.main.bind( 'game_over', function( data ) {
+		Game.MarkField( data.row, data.col, data.game, data.team );		
+		Game.MarkWinner(data.start_row, data.start_col, data.dir, data.game, data.fields );
+		Game.elements.panel_msg.prepend( data.html );
+		
+		// unsubscribe from any further msgs
+		Game.Pusher.unsubscribe( 'game-'+data.game );
 	});
 }
 

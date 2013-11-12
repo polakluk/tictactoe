@@ -56,6 +56,7 @@ class GameController extends BaseController {
 		$row = (int)$this->f3->get( "POST.row" );
 		$col = (int)$this->f3->get( "POST.col" );
 		$turn = (int)$this->f3->get( 'POST.turn' );
+		$socket = $this->f3->get( 'POST.socket' );
 
 		$model = new \Models\MoveModel( $this->f3, $this->db );
 		$exists = $model->CheckExistence( $this->player->game, $row, $col, $turn );
@@ -74,16 +75,6 @@ class GameController extends BaseController {
 
 		$model_desk = new \Models\DeskModel( $this->f3, $this->db );
 		$game = $model_desk->GetItem( $this->player->game, true );
-		if( $game->game_team != $this->player->team ) { // not your turn dude
-			$result = new \stdClass();
-			$result->state = 0;
-			$this->f3->set( 'msg_text', 'It\'s not your turn dude! :)' );
-			$this->f3->set( 'msg_type', 'danger' );
-			$result->html = \Template::instance()->render( 'views/game/msg.htm' );
-			$this->f3->clear( 'msg_text' );
-			$this->f3->clear( 'msg_type' );
-			return json_encode($result);
-		}
 
 		if( $game->game_ended == 1 ) { // the game already ended
 			$result = new \stdClass();
@@ -96,10 +87,22 @@ class GameController extends BaseController {
 			return json_encode($result);
 		}
 
+		if( $game->game_team != $this->player->team ) { // not your turn dude
+			$result = new \stdClass();
+			$result->state = 0;
+			$this->f3->set( 'msg_text', 'It\'s not your turn dude! :)' );
+			$this->f3->set( 'msg_type', 'danger' );
+			$result->html = \Template::instance()->render( 'views/game/msg.htm' );
+			$this->f3->clear( 'msg_text' );
+			$this->f3->clear( 'msg_type' );
+			return json_encode($result);
+		}
+
 		
 		$players = $model_desk->GetNumberPlayers( $this->player->game, $this->player->team );
 		
 		$msg = array();
+		$pusher = new \Pusher( $this->f3->get( 'Pusher.key' ), $this->f3->get( 'Pusher.secret' ), $this->f3->get( 'Pusher.app' ));
 		switch( $exists )
 		{
 			case \Tools::MOVE_STATE_NONE:
@@ -123,6 +126,15 @@ class GameController extends BaseController {
 						$table->state = \Tools::MOVE_STATE_DONE;
 						$table->turn = $game->game_turn;
 						$table->save();
+						$data = array( 'col' => $col, 'row' => $row, 'team' => $this->player->team, 'game' => $this->player->game );
+						$pusher->trigger( 'game-'.$game->game_id, 'move', $data );
+
+						// update game stats
+						$game->game_turn++;
+						$game->game_team = 1 + (2 - $game->game_team);
+						$game->save();
+						$data = array( 'turn' => $game->game_turn, 'team' => $game->game_team );
+						$pusher->trigger( 'game-'.$game->game_id, 'update_stats', $data );
 						
 						// check, if the game is not over
 						$res = $this->checkGame( $this->player->game, $row, $col );
@@ -146,13 +158,22 @@ class GameController extends BaseController {
 							$this->f3->clear( 'msg_text' );
 							$this->f3->clear( 'msg_type' );
 							$this->finishGame( $this->player->game );
+							$data = array(
+								'start_row' => $res->row,
+								'start_col' => $res->col,
+								'row' => $row,
+								'col' => $col,
+								'dir' => $res->dir,
+								'game' => $this->player->game,
+								'team' => $this->player->team,
+								'fields' => \Tools::CONNECT_FIELDS,
+								'html' => $result->html,
+								'socket' => $socket
+							);
+							$pusher->trigger( 'game-'.$game->game_id, 'game_over', $data, $socket );
 							return json_encode($result);
 						}
 						
-						// update game stats
-						$game->game_turn++;
-						$game->game_team = 1 + (2 - $game->game_team);
-						$game->save();
 						$state = 1;
 					}
 					break;
@@ -176,7 +197,6 @@ class GameController extends BaseController {
 		
 		$result = new \stdClass();
 		$result->state = $state;
-		$result->turn = $game->game_turn;
 		$result->team = $this->player->team;
 		$result->row = $row;
 		$result->col = $col;
@@ -362,6 +382,7 @@ class GameController extends BaseController {
 		$model = new \Models\DeskModel( $this->f3, $this->db );
 		$game = $model->GetItem( $id, true );
 		$game->game_ended = 1;
+		$game->game_turn++;
 		$game->save();
 		
 		$game->reset();

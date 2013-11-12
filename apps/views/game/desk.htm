@@ -2,7 +2,12 @@
 	<div class="panel-heading">
     	<h3 class="panel-title">Game #{{ @game_id }}</h3>
   	</div>
-	<table class="table table-bordered text-center table-desk" data-enabled="1" data-game="{{ @game_id}}">
+	<table class="table table-bordered text-center table-desk" 
+		<check if="{{ @spectator }}">
+			<true>data-enabled="0"</true>
+			<false>data-enabled="1"</false>
+		</check>
+	 data-game="{{ @game_id}}">
 		<repeat group="{{ @game_table }}" key="{{ @num_row }}" value="{{ @row }}">
 			<tr class="game">
 				<repeat group="{{ @row }}" key="{{ @num_col }}" value="{{ @col }}">
